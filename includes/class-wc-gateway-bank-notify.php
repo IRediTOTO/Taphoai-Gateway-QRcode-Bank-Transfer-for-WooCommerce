@@ -699,7 +699,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         return $order->get_payment_method() !== $this->id || $order->has_status(['processing', 'completed']);
     }
 
-    private function get_bank_data()
+    public static function get_supported_bank_data()
     {
         return [
             'vietcombank' => ['bin' => '970436', 'code' => 'VCB', 'short_name' => 'Vietcombank', 'full_name' => 'Ngân hàng TMCP Ngoại Thương Việt Nam'],
@@ -722,6 +722,11 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             'ocb' => ['bin' => '970448', 'code' => 'OCB', 'short_name' => 'OCB', 'full_name' => 'Ngân hàng TMCP Phương Đông'],
             'abbank' => ['bin' => '970425', 'code' => 'ABBANK', 'short_name' => 'ABBANK', 'full_name' => 'Ngân hàng TMCP An Bình'],
         ];
+    }
+
+    public function get_bank_data()
+    {
+        return self::get_supported_bank_data();
     }
 
     private function get_bank_info($identifier)
@@ -808,6 +813,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
 
         $data = wp_parse_args($data, $defaults);
         $webhook_url = rest_url('bank-notify-gateway/v1/new-payment');
+        $bank_detection_keys = implode(', ', array_keys($this->get_bank_data()));
 
         ob_start();
     ?>
@@ -837,6 +843,16 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
                                 <li><strong>Content-Type:</strong> text/plain</li>
                                 <li><strong>Body:</strong> Nội dung thông báo thanh toán từ ngân hàng</li>
                             </ul>
+
+                            <h4>Nhận diện ngân hàng trong body</h4>
+                            <p>Plugin xác minh thanh toán bằng số tài khoản đã cấu hình. Tên ngân hàng chỉ dùng để hỗ trợ parser đọc đúng nội dung thông báo.</p>
+                            <p>Nếu ứng dụng gửi webhook cho phép tuỳ chỉnh body, bạn nên thêm một dòng chứa bank key của ngân hàng nhận tiền. Các key đang hỗ trợ:</p>
+                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px;"><?php echo esc_html($bank_detection_keys); ?></pre>
+                            <p>Ví dụ với TPBank:</p>
+                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px;">tpbank
+TK: xxxx0001201
+PS:+39.000VND
+ND: DH123</pre>
 
                             <h4>Xác thực API Key</h4>
                             <p>Gửi API key bằng header Authorization theo định dạng Bearer token.</p>

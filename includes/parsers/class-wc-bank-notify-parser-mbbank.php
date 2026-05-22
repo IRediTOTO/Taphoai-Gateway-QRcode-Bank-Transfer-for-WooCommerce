@@ -33,11 +33,6 @@ class Taphoai_BankNotify_Parser_MBBank extends Taphoai_BankNotify_Parser_Abstrac
             return true;
         }
 
-        // Kiểm tra format có dấu | và các trường đặc trưng
-        if (preg_match('/\|/', $this->body) && preg_match('/(TK|GD|SD|ND):/i', $this->body)) {
-            return true;
-        }
-
         return false;
     }
 
@@ -104,7 +99,7 @@ class Taphoai_BankNotify_Parser_MBBank extends Taphoai_BankNotify_Parser_Abstrac
 
         // Tìm phần TK: (Tài khoản)
         // Format: TK 37xxx818 hoặc TK 370031818
-        if (preg_match('/TK\s+([0-9x]+)/i', $body, $matches)) {
+        if (preg_match('/TK[\s:]+([0-9x]+)/i', $body, $matches)) {
             // Loại bỏ ký tự x (ẩn số)
             $account = str_replace('x', '', $matches[1]);
             return $account;

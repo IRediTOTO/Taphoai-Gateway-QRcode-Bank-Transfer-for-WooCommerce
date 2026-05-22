@@ -13,8 +13,18 @@ class Taphoai_BankNotify_Parser_Factory
      * Danh sách các parser classes
      */
     private static $parsers = [
-        'Taphoai_BankNotify_Parser_MBBank',
         'Taphoai_BankNotify_Parser_TPBank',
+        'Taphoai_BankNotify_Parser_MBBank',
+    ];
+
+    /**
+     * Parser riêng cho các ngân hàng đã hỗ trợ format cụ thể.
+     */
+    private static $bank_parser_map = [
+        'tpbank' => 'Taphoai_BankNotify_Parser_TPBank',
+        'tpb' => 'Taphoai_BankNotify_Parser_TPBank',
+        'mbbank' => 'Taphoai_BankNotify_Parser_MBBank',
+        'mb' => 'Taphoai_BankNotify_Parser_MBBank',
     ];
 
     /**
@@ -29,30 +39,71 @@ class Taphoai_BankNotify_Parser_Factory
             'body_preview' => substr($body, 0, 100),
         ]);
 
-        // Loop qua tất cả parsers và tìm parser phù hợp
-        foreach (self::$parsers as $parser_class) {
-            if (!class_exists($parser_class)) {
-                Taphoai_BankNotify_Logger::warning('Parser Factory: Parser class not found', [
-                    'class' => $parser_class,
-                ]);
-                continue;
+        $detected_bank = self::detect_bank_from_body($body);
+
+        if ($detected_bank) {
+            $parser_class = isset(self::$bank_parser_map[$detected_bank['key']])
+                ? self::$bank_parser_map[$detected_bank['key']]
+                : null;
+
+            if (!$parser_class && isset(self::$bank_parser_map[strtolower($detected_bank['code'])])) {
+                $parser_class = self::$bank_parser_map[strtolower($detected_bank['code'])];
             }
 
-            $parser = new $parser_class($body);
-
-            if ($parser->detect()) {
-                Taphoai_BankNotify_Logger::info('Parser Factory: Bank detected', [
+            if ($parser_class && class_exists($parser_class)) {
+                $parser = new $parser_class($body);
+                Taphoai_BankNotify_Logger::info('Parser Factory: Bank key detected, using specific parser', [
                     'parser' => $parser_class,
+                    'bank_key' => $detected_bank['key'],
                     'bank_name' => $parser->get_bank_name(),
                     'bank_code' => $parser->get_bank_code(),
                 ]);
                 return $parser;
             }
+
+            Taphoai_BankNotify_Logger::info('Parser Factory: Bank key detected, using generic parser', [
+                'bank_key' => $detected_bank['key'],
+                'bank_name' => $detected_bank['short_name'],
+                'bank_code' => $detected_bank['code'],
+            ]);
+
+            return new Taphoai_BankNotify_Parser_Generic($body, $detected_bank['short_name'], $detected_bank['code']);
         }
 
-        // Nếu không tìm thấy parser phù hợp, sử dụng TPBank làm default
-        Taphoai_BankNotify_Logger::warning('Parser Factory: No specific parser detected, using default TPBank parser');
-        return new Taphoai_BankNotify_Parser_TPBank($body);
+        // Không có bank key trong body thì dùng parser mặc định để cố gắng trích xuất dữ liệu.
+        Taphoai_BankNotify_Logger::warning('Parser Factory: No bank key detected, using generic parser');
+        return new Taphoai_BankNotify_Parser_Generic($body);
+    }
+
+    /**
+     * Nhận diện ngân hàng bằng key/code/short_name trong body.
+     */
+    private static function detect_bank_from_body($body)
+    {
+        if (!class_exists('Taphoai_Gateway_BankNotify') || !method_exists('Taphoai_Gateway_BankNotify', 'get_supported_bank_data')) {
+            return null;
+        }
+
+        $body_lower = function_exists('mb_strtolower') ? mb_strtolower($body, 'UTF-8') : strtolower($body);
+        $bank_data = Taphoai_Gateway_BankNotify::get_supported_bank_data();
+
+        foreach ($bank_data as $bank_key => $bank) {
+            $needles = array_filter([
+                $bank_key,
+                isset($bank['code']) ? $bank['code'] : null,
+                isset($bank['short_name']) ? $bank['short_name'] : null,
+            ]);
+
+            foreach ($needles as $needle) {
+                $needle_lower = function_exists('mb_strtolower') ? mb_strtolower($needle, 'UTF-8') : strtolower($needle);
+
+                if (preg_match('/(?<![a-z0-9])' . preg_quote($needle_lower, '/') . '(?![a-z0-9])/i', $body_lower)) {
+                    return array_merge(['key' => $bank_key], $bank);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

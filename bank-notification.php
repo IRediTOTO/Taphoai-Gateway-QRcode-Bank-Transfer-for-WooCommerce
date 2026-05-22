@@ -89,6 +89,7 @@ function bank_notify_init_gateway_class()
 
     // Load parsers
     require_once dirname(__FILE__) . '/includes/parsers/abstract-wc-bank-notify-parser.php';
+    require_once dirname(__FILE__) . '/includes/parsers/class-wc-bank-notify-parser-generic.php';
     require_once dirname(__FILE__) . '/includes/parsers/class-wc-bank-notify-parser-tpbank.php';
     require_once dirname(__FILE__) . '/includes/parsers/class-wc-bank-notify-parser-mbbank.php';
     require_once dirname(__FILE__) . '/includes/parsers/class-wc-bank-notify-parser-factory.php';

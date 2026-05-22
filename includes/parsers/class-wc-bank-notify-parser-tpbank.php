@@ -30,6 +30,11 @@ class Taphoai_BankNotify_Parser_TPBank extends Taphoai_BankNotify_Parser_Abstrac
             return true;
         }
 
+        // Format SMS/app notification phổ biến: TK, PS, SD, ND trên từng dòng.
+        if (preg_match('/(?:^|\R)TK\s*:/i', $this->body) && preg_match('/(?:^|\R)ND\s*:/i', $this->body)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -42,6 +47,17 @@ class Taphoai_BankNotify_Parser_TPBank extends Taphoai_BankNotify_Parser_Abstrac
 
         // Loại bỏ prefix SEVQR nếu có
         $body = preg_replace('/^SEVQR\s+/i', '', $body);
+
+        // Tìm nội dung chuyển khoản trong dòng ND:.
+        if (preg_match('/(?:^|\R)ND\s*:\s*(.+?)(?:\R|$)/i', $body, $matches)) {
+            $content = trim($matches[1]);
+            $content = preg_replace('/\b\d{10,}\b/', '', $content);
+            $content = trim($content);
+
+            if (strlen($content) >= 3 && strlen($content) <= 100) {
+                return $content;
+            }
+        }
 
         // Tìm pattern: Tiền tố (2-10 chữ cái) + Số
         // Ví dụ: DH35434, ORDER123, etc.
@@ -106,13 +122,13 @@ class Taphoai_BankNotify_Parser_TPBank extends Taphoai_BankNotify_Parser_Abstrac
         $body = $this->body;
 
         // Pattern 1: Tài khoản: 19028697499027
-        if (preg_match('/(?:Tài khoản|Account|TK|ACC)[\s:]+(\d{10,20})/i', $body, $matches)) {
-            return $matches[1];
+        if (preg_match('/(?:Tài khoản|Account|TK|ACC)[\s:]+([0-9x]{4,20})/i', $body, $matches)) {
+            return str_replace('x', '', $matches[1]);
         }
 
         // Pattern 2: Số TK 19028697499027
-        if (preg_match('/(?:Số TK|Account No|A\/C)[\s:]+(\d{10,20})/i', $body, $matches)) {
-            return $matches[1];
+        if (preg_match('/(?:Số TK|Account No|A\/C)[\s:]+([0-9x]{4,20})/i', $body, $matches)) {
+            return str_replace('x', '', $matches[1]);
         }
 
         return null;

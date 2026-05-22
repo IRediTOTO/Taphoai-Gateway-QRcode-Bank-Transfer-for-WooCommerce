@@ -1,0 +1,77 @@
+name: Build plugin zip
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build distributable zip
+    runs-on: ubuntu-latest
+
+    env:
+      PLUGIN_SLUG: taphoai-gateway
+      MAIN_PLUGIN_FILE: bank-notification.php
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read plugin version
+        id: plugin
+        shell: bash
+        run: |
+          version="$(grep -m1 '^[[:space:]]*\*[[:space:]]*Version:' "$MAIN_PLUGIN_FILE" | sed -E 's/.*Version:[[:space:]]*//')"
+
+          if [ -z "$version" ]; then
+            echo "Could not read plugin version from $MAIN_PLUGIN_FILE" >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "zip_name=${PLUGIN_SLUG}-${version}.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Validate plugin files
+        shell: bash
+        run: |
+          test -f "$MAIN_PLUGIN_FILE"
+          test -f readme.txt
+          php -l "$MAIN_PLUGIN_FILE"
+          find includes -name '*.php' -print0 | xargs -0 -r -n1 php -l
+
+      - name: Build zip
+        shell: bash
+        run: |
+          rm -rf build dist
+          mkdir -p "build/$PLUGIN_SLUG" dist
+
+          rsync -a ./ "build/$PLUGIN_SLUG/" \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'build/' \
+            --exclude 'dist/' \
+            --exclude 'node_modules/' \
+            --exclude '.DS_Store'
+
+          cd build
+          zip -r "../dist/${{ steps.plugin.outputs.zip_name }}" "$PLUGIN_SLUG"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}-${{ steps.plugin.outputs.version }}
+          path: dist/${{ steps.plugin.outputs.zip_name }}
+          if-no-files-found: error
+
+      - name: Create GitHub release for tags
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ steps.plugin.outputs.zip_name }}

@@ -1,0 +1,719 @@
+:root {
+    --sepay-color: #006DD6;
+    --sepay-border: rgb(226 232 240);
+}
+
+.woocommerce-sepay-bank-details {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 56rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--sepay-color);
+    background-color: #fff;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.woocommerce-sepay-bank-details * {
+    margin: 0; padding: 0;
+}
+
+.box-title {
+    padding-bottom: 0.5rem;
+    text-align: center;
+    font-weight: 700;
+    padding-top: 0.5rem;
+    border-bottom: 1px solid var(--sepay-border);
+}
+
+.sepay-countdown-wrapper {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.sepay-pay-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
+    padding: 0.5rem 0;
+}
+
+.sepay-status-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.sepay-status-wrapper img {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.sepay-countdown-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.sepay-countdown-box .countdown-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    stroke: white;
+}
+
+.sepay-countdown-box .countdown-label {
+    font-size: 0.875rem;
+}
+
+.sepay-countdown-box .countdown-time {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: 0.05em;
+}
+
+.sepay-countdown-box.warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    animation: pulse-warning 1.5s ease-in-out infinite;
+}
+
+.sepay-countdown-box.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    animation: pulse-danger 1s ease-in-out infinite;
+}
+
+.sepay-countdown-box.expired {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    animation: none;
+}
+
+@keyframes pulse-warning {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+}
+
+@keyframes pulse-danger {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.85;
+        transform: scale(1.05);
+    }
+}
+
+
+.sepay-box {
+    padding: 1rem;
+}
+
+.sepay-pay-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    align-items: center;
+}
+
+.sepay-pay-info .qr-box {
+    flex: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sepay-pay-info .qr-box .qr-title {
+    text-align: center;
+}
+
+.sepay-pay-info .qr-box .qr-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sepay-pay-info .qr-element {
+    width: 18rem;
+    max-width: 100%;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.sepay-pay-info .qr-element .qr-image {
+    width: 100%;
+}
+
+.sepay-pay-info .qr-top-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sepay-pay-info .qr-top-border:before {
+    content: "";
+    width: 30%;
+    height: 100%;
+    border-left: 1px solid green;
+    border-top: 1px solid green;
+}
+
+.sepay-pay-info .qr-top-border:after {
+    border-right: 1px solid green;
+    border-top: 1px solid green;
+    content: "";
+    width: 30%;
+    height: 100%;
+}
+
+.sepay-pay-info .qr-bottom-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sepay-pay-info .qr-bottom-border:before {
+    content: "";
+    width: 30%;
+    height: 100%;
+    border-left: 1px solid green;
+    border-bottom: 1px solid green;
+}
+
+.sepay-pay-info .qr-bottom-border:after {
+    border-right: 1px solid green;
+    border-bottom: 1px solid green;
+    content: "";
+    width: 30%;
+    height: 100%;
+}
+
+.sepay-pay-info .download-qr {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+}
+
+.sepay-pay-info .button-qr {
+    margin-left: auto;
+    margin-right: auto;
+    display: inline-flex;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--sepay-color);
+    color: #fff;
+    text-decoration: none;
+    gap: 0.25rem;
+    align-items: center;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+}
+
+.sepay-pay-info .button-qr svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+    stroke: white !important;
+}
+
+.sepay-pay-info .button-qr span {
+    color: white !important;
+}
+
+.sepay-pay-info .manual-box {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 1rem;
+    justify-content: space-between;
+
+    .manual-title {
+        text-align: center;
+    }
+
+    .bank-info {
+        border: 1px solid var(--sepay-border);
+        border-radius: 0.375rem;
+        overflow: hidden;
+
+        .banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--sepay-border);
+
+            .bank-logo {
+                max-height: 3rem;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        .bank-info-table {
+            display: table;
+            width: 100%;
+
+            .bank-info-cell {
+                display: table-cell;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .bank-info-cell:last-child {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                padding-bottom: 0.5rem;
+                margin-top: -0.5rem !important;
+                border-bottom: 1px solid var(--sepay-border);
+            }
+
+            .bank-info-row {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .bank-info-row-group {
+                display: table-row-group;
+            }
+
+            .bank-info-value {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+        }
+
+        .note {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            border: 1px solid #e0cd9d;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            background-color: #faebd7a1;
+            border-radius: 0.375rem;
+        }
+
+        .note svg {
+            color: #b09b66;
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-top: 0.125rem;
+            flex: none;
+        }
+    }
+}
+
+.sepay-pay-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
+    padding: 0.5rem 0;
+}
+
+.sepay-status-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.sepay-status-wrapper img {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.paid-notification {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    font-size: 2rem;
+    text-align: center;
+    color: #73AF55;
+
+    .path {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 0;
+        &.circle {
+            -webkit-animation: dash .9s ease-in-out;
+            animation: dash .9s ease-in-out;
+        }
+        &.line {
+            stroke-dashoffset: 1000;
+            -webkit-animation: dash .9s .35s ease-in-out forwards;
+            animation: dash .9s .35s ease-in-out forwards;
+        }
+        &.check {
+            stroke-dashoffset: -100;
+            -webkit-animation: dash-check .9s .35s ease-in-out forwards;
+            animation: dash-check .9s .35s ease-in-out forwards;
+        }
+    }
+}
+
+.paid-notification > * {
+    margin: 0; padding: 0;
+}
+
+.paid-notification svg {
+    width: 5rem;
+    height: 5rem;
+}
+
+.sepay-download {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sepay-download .autodownload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sepay-download .autodownload .countdown {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    text-align: center;
+}
+
+.sepay-download .autodownload .subtle {
+    color: #64748b;
+}
+
+.sepay-download .autodownload .force-download {
+    color: var(--sepay-color);
+    text-decoration: underline;
+    cursor: pointer;
+    text-underline-offset: 2px;
+}
+
+.sepay-download .download-list {
+    border: 1px solid var(--sepay-border);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.sepay-download .download-list .download-group {
+    border-bottom: 1px solid var(--sepay-border);
+    padding: 0.5rem 1rem;
+    background-color: #f8fafc;
+    font-weight: 500;
+}
+
+.sepay-download .download-list .download-item {
+    border-bottom: 1px solid var(--sepay-border);
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sepay-download .download-list .download-item:last-child {
+    border-bottom: none;
+}
+
+.sepay-download .download-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sepay-download .download-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sepay-download .download-name svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+}
+
+.sepay-download .download-remaining, .sepay-download .download-expire {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #6b7280;
+}
+
+.sepay-download .download-button {
+    margin-left: auto;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+    color: var(--sepay-color);
+    border: 1px solid var(--sepay-color);
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.sepay-download .download-button:disabled, .sepay-download .download-button[disabled] {
+    cursor: not-allowed;
+    color: var(--sepay-border) !important;
+    border: 1px solid var(--sepay-border) !important;
+}
+
+.sepay-download .download-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+@-webkit-keyframes dash {
+    0% {
+        stroke-dashoffset: 1000;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dashoffset: 1000;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@-webkit-keyframes dash-check {
+    0% {
+        stroke-dashoffset: -100;
+    }
+    100% {
+        stroke-dashoffset: 900;
+    }
+}
+
+@keyframes dash-check {
+    0% {
+        stroke-dashoffset: -100;
+    }
+    100% {
+        stroke-dashoffset: 900;
+    }
+}
+
+@media (min-width: 480px) {
+    .bank-info-row {
+        display: table-row !important;
+        flex-direction: unset;
+    }
+
+    .bank-info-cell {
+        border-bottom: 1px solid var(--sepay-border);
+    }
+
+    .sepay-download .download-list .download-item {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+@media (min-width: 768px) {
+    .sepay-pay-info {
+        flex-direction: row;
+        padding: 1rem;
+        margin-top: 0.75rem;
+        align-items: stretch;
+    }
+
+    .sepay-pay-info .qr-box {
+        width: 18rem;
+    }
+
+    .sepay-download {
+        padding: 1rem;
+    }
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.sepay-pay-info .manual-box .bank-info .banner {
+    min-height: 6.5rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+}
+
+.sepay-pay-info .manual-box .bank-info .banner .bank-logo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: min(16rem, 82%);
+    max-height: 5rem;
+    object-fit: contain;
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    background-color: rgba(0, 109, 214, 0.08);
+    text-decoration: none;
+    color: var(--sepay-color);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value a:after {
+    display: inline;
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value a:hover {
+    background-color: rgba(0, 109, 214, 0.15);
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value a:active {
+    transform: scale(0.97);
+    background-color: rgba(0, 109, 214, 0.2);
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value a.copied {
+    background-color: rgba(46, 153, 101, 0.15);
+    color: #2E9965;
+}
+
+.sepay-pay-info .manual-box .bank-info .bank-info-value a.copied svg path {
+    fill: #2E9965;
+}
+
+.dynamic-sub-account:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.dynamic-sub-account:disabled option {
+    color: #999;
+}
+
+.dynamic-sub-account option[value=""] {
+    color: #666;
+    font-style: italic;
+}
+
+.dynamic-sub-account[disabled] {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.dynamic-sub-account[disabled] option {
+    color: #999;
+}
+
+@media (max-width: 480px) {
+    .sepay-countdown-box {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+        padding: 0.5rem 0.875rem;
+        gap: 0.375rem;
+        font-size: 0.8125rem;
+    }
+
+    .sepay-countdown-box .countdown-icon {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+
+    .sepay-countdown-box .countdown-label {
+        font-size: 0.8125rem;
+    }
+
+    .sepay-countdown-box .countdown-time {
+        font-size: 0.9375rem;
+    }
+
+    .sepay-pay-info .manual-box .bank-info .bank-info-value span:first-child {
+        width: 100%;
+    }
+
+    .sepay-pay-info .manual-box .bank-info .bank-info-value a {
+        margin-left: 0;
+        margin-top: 0.25rem;
+        padding: 0.625rem 0.875rem;
+    }
+
+    .sepay-pay-info .manual-box .bank-info .banner {
+        min-height: 5.75rem;
+        padding: 0.875rem 1rem;
+    }
+
+    .sepay-pay-info .manual-box .bank-info .banner .bank-logo {
+        max-width: 88%;
+        max-height: 4.25rem;
+    }
+}

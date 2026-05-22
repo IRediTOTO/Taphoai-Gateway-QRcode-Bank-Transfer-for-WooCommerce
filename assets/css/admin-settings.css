@@ -1,0 +1,86 @@
+/* Payment Code Settings Styles */
+.woocommerce table.form-table h3.wc-settings-sub-title,
+.woocommerce table.form-table + h3.wc-settings-sub-title,
+h3.wc-settings-sub-title {
+    margin: 28px 0 8px;
+    padding: 14px 16px;
+    color: #1d2327;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-left: 4px solid #2271b1;
+    border-radius: 4px;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+h3.wc-settings-sub-title:first-of-type {
+    margin-top: 12px;
+}
+
+h3.wc-settings-sub-title + p {
+    margin: 0 0 16px;
+    max-width: 780px;
+    color: #50575e;
+}
+
+.woocommerce table.form-table {
+    margin-bottom: 22px;
+}
+
+.woocommerce table.form-table th {
+    padding-left: 16px;
+}
+
+.woocommerce table.form-table td {
+    padding-right: 16px;
+}
+
+.bank-notify-generate-api-key {
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+#woocommerce_bank_notify_webhook_api_key {
+    min-width: 360px;
+}
+
+.payment-code-prefix-field,
+.payment-code-expiry-field {
+    transition: opacity 0.3s ease, height 0.3s ease;
+}
+
+.bank-notify-bank-search {
+    display: block;
+    width: 350px;
+    max-width: 100%;
+    margin: 0 0 8px;
+}
+
+#woocommerce_bank_notify_bank_select.bank-notify-bank-select,
+.woocommerce table.form-table .select2-container,
+.woocommerce table.form-table .selectWoo-container {
+    max-width: 100%;
+}
+
+#woocommerce_bank_notify_bank_select.bank-notify-bank-select {
+    min-width: 350px;
+}
+
+/* Info box for expiry settings */
+.bank-notify-expiry-info {
+    background: #e7f5fe;
+    border-left: 4px solid #00a0d2;
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 3px;
+}
+
+.bank-notify-expiry-info p {
+    margin: 0;
+    color: #23282d;
+}
+
+.bank-notify-expiry-info .dashicons {
+    color: #00a0d2;
+    margin-right: 5px;
+}

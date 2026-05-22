@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PLUGIN_SLUG: taphoai-gateway
+      PLUGIN_SLUG: taphoai-gateway-qrcode-bank-transfer-for-woocommerce
       MAIN_PLUGIN_FILE: bank-notification.php
 
     steps:

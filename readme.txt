@@ -53,7 +53,7 @@ Privacy policy: https://sepay.vn/en/privacy-policy.html
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/taphoai-gateway`, or install the plugin through the WordPress plugins screen.
+1. Upload the plugin files to `/wp-content/plugins/taphoai-gateway-qrcode-bank-transfer-for-woocommerce`, or install the plugin through the WordPress plugins screen.
 2. Activate the plugin through the Plugins screen in WordPress.
 3. Make sure WooCommerce is installed and active.
 4. Go to WooCommerce > Settings > Payments > Bank Transfer.

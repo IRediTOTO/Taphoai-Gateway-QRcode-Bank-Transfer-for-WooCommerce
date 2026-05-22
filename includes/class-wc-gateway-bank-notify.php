@@ -440,7 +440,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
                         name="<?php echo esc_attr($field_key); ?>"
                         id="<?php echo esc_attr($field_key); ?>"
                         style="<?php echo esc_attr($data['css']); ?>"
-                        data-placeholder="<?php echo esc_attr__('Chọn hoặc tìm ngân hàng', 'taphoai-gateway'); ?>"
+                        data-placeholder="<?php echo esc_attr__('Chọn hoặc tìm ngân hàng', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'); ?>"
                         data-allow_clear="true"
                         <?php disabled($data['disabled'], true); ?>
                         <?php echo wp_kses_post($this->get_custom_attribute_html($data)); ?>>

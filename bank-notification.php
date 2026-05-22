@@ -7,7 +7,7 @@
  * Requires at least: 6.8
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
- * Text Domain: taphoai-gateway
+ * Text Domain: taphoai-gateway-qrcode-bank-transfer-for-woocommerce
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -308,12 +308,12 @@ function bank_notify_handle_log_actions()
     // View log
     if ($page === 'wc-settings' && $section === 'bank_notify' && $view_log === '1') {
         if (!current_user_can('manage_woocommerce')) {
-            wp_die(esc_html__('You do not have permission to view this log.', 'taphoai-gateway'));
+            wp_die(esc_html__('You do not have permission to view this log.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
         $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
         if (!wp_verify_nonce($nonce, 'view_bank_notify_log')) {
-            wp_die(esc_html__('Security check failed.', 'taphoai-gateway'));
+            wp_die(esc_html__('Security check failed.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
         $log_file_path = WC_BankNotify_Logger::get_log_file_path();
@@ -332,19 +332,19 @@ function bank_notify_handle_log_actions()
             echo esc_html($wp_filesystem->get_contents($log_file_path));
             exit;
         } else {
-            wp_die(esc_html__('Log file not found.', 'taphoai-gateway'));
+            wp_die(esc_html__('Log file not found.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
     }
 
     // Clear log
     if ($page === 'wc-settings' && $section === 'bank_notify' && $clear_log === '1') {
         if (!current_user_can('manage_woocommerce')) {
-            wp_die(esc_html__('You do not have permission to clear this log.', 'taphoai-gateway'));
+            wp_die(esc_html__('You do not have permission to clear this log.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
         $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
         if (!wp_verify_nonce($nonce, 'clear_bank_notify_log')) {
-            wp_die(esc_html__('Security check failed.', 'taphoai-gateway'));
+            wp_die(esc_html__('Security check failed.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
         $log_file_path = WC_BankNotify_Logger::get_log_file_path();

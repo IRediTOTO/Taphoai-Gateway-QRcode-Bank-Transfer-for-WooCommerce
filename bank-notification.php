@@ -65,7 +65,7 @@ add_filter('woocommerce_payment_gateways', 'bank_notify_add_gateway_class');
 
 function bank_notify_add_gateway_class($gateways)
 {
-    $gateways[] = 'WC_Gateway_BankNotify';
+    $gateways[] = 'Taphoai_Gateway_BankNotify';
     return $gateways;
 }
 
@@ -91,7 +91,7 @@ function bank_notify_init_gateway_class()
     require_once dirname(__FILE__) . '/includes/class-wc-bank-notify-webhook-handler.php';
 
     // Initialize webhook handler
-    new WC_BankNotify_Webhook_Handler();
+    new Taphoai_BankNotify_Webhook_Handler();
 }
 
 add_action('before_woocommerce_init', 'bank_notify_declare_woocommerce_support');
@@ -115,7 +115,7 @@ function bank_notify_woocommerce_block_support()
         add_action(
             'woocommerce_blocks_payment_method_type_registration',
             function (PaymentMethodRegistry $payment_method_registry) {
-                $payment_method_registry->register(new WC_BankNotify_Blocks_Support());
+                $payment_method_registry->register(new Taphoai_BankNotify_Blocks_Support());
             }
         );
     }
@@ -129,11 +129,18 @@ function bank_notify_add_scripts($hook)
         return;
     }
 
+    $page = filter_input(INPUT_GET, 'page', FILTER_UNSAFE_RAW);
+    $tab = filter_input(INPUT_GET, 'tab', FILTER_UNSAFE_RAW);
+    $section = filter_input(INPUT_GET, 'section', FILTER_UNSAFE_RAW);
+
+    if ($page === null || $tab === null || $section === null) {
+        return;
+    }
+
     if (
-        !isset($_GET['page'], $_GET['tab'], $_GET['section']) ||
-        sanitize_key(wp_unslash($_GET['page'])) !== 'wc-settings' ||
-        sanitize_key(wp_unslash($_GET['tab'])) !== 'checkout' ||
-        sanitize_key(wp_unslash($_GET['section'])) !== 'bank_notify'
+        sanitize_key(wp_unslash($page)) !== 'wc-settings' ||
+        sanitize_key(wp_unslash($tab)) !== 'checkout' ||
+        sanitize_key(wp_unslash($section)) !== 'bank_notify'
     ) {
         return;
     }
@@ -174,7 +181,7 @@ function bank_notify_activate()
 {
     // Create database tables
     require_once dirname(__FILE__) . '/includes/class-wc-bank-notify-db.php';
-    $db = new WC_BankNotify_DB();
+    $db = new Taphoai_BankNotify_DB();
     $db->create_tables();
 
     // Schedule cron job for releasing expired codes
@@ -225,12 +232,12 @@ function bank_notify_check_codes_notice()
     }
 
     // Load required classes
-    if (!class_exists('WC_BankNotify_Payment_Code_Manager')) {
+    if (!class_exists('Taphoai_BankNotify_Payment_Code_Manager')) {
         require_once dirname(__FILE__) . '/includes/class-wc-bank-notify-db.php';
         require_once dirname(__FILE__) . '/includes/class-wc-bank-notify-payment-code-manager.php';
     }
 
-    $manager = new WC_BankNotify_Payment_Code_Manager();
+    $manager = new Taphoai_BankNotify_Payment_Code_Manager();
     $stats = $manager->get_stats(true); // Use cache for performance
 
     // Check if gateway is enabled
@@ -316,7 +323,7 @@ function bank_notify_handle_log_actions()
             wp_die(esc_html__('Security check failed.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
-        $log_file_path = WC_BankNotify_Logger::get_log_file_path();
+        $log_file_path = Taphoai_BankNotify_Logger::get_log_file_path();
 
         if ($log_file_path && file_exists($log_file_path)) {
             global $wp_filesystem;
@@ -347,7 +354,7 @@ function bank_notify_handle_log_actions()
             wp_die(esc_html__('Security check failed.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
-        $log_file_path = WC_BankNotify_Logger::get_log_file_path();
+        $log_file_path = Taphoai_BankNotify_Logger::get_log_file_path();
 
         if ($log_file_path && file_exists($log_file_path)) {
             wp_delete_file($log_file_path);
@@ -432,7 +439,7 @@ function bank_notify_release_code_on_cancel($order_id)
         $mode = $order->get_meta('_bank_notify_payment_mode');
 
         if ($code && $mode === 'natural') {
-            $manager = new WC_BankNotify_Payment_Code_Manager();
+            $manager = new Taphoai_BankNotify_Payment_Code_Manager();
             if ($manager->get_code_status($code) === 'assigned') {
                 $manager->release_code($code);
             }
@@ -457,7 +464,7 @@ function bank_notify_delete_single_code_handler()
         wp_send_json_error(['message' => 'Code is required']);
     }
 
-    $manager = new WC_BankNotify_Payment_Code_Manager();
+    $manager = new Taphoai_BankNotify_Payment_Code_Manager();
     $deleted = $manager->delete_code($code);
 
     if ($deleted !== false) {
@@ -485,7 +492,7 @@ function bank_notify_release_single_code_handler()
         wp_send_json_error(['message' => 'Code is required']);
     }
 
-    $manager = new WC_BankNotify_Payment_Code_Manager();
+    $manager = new Taphoai_BankNotify_Payment_Code_Manager();
     if ($manager->get_code_status($code) !== 'assigned') {
         wp_send_json_error(['message' => 'Only assigned codes can be released']);
     }
@@ -585,11 +592,11 @@ add_action('bank_notify_release_expired_codes', 'bank_notify_release_expired_cod
 
 function bank_notify_release_expired_codes_handler()
 {
-    $manager = new WC_BankNotify_Payment_Code_Manager();
+    $manager = new Taphoai_BankNotify_Payment_Code_Manager();
     $released_count = $manager->release_expired_codes();
 
     if ($released_count > 0) {
-        WC_BankNotify_Logger::info('Released expired payment codes', [
+        Taphoai_BankNotify_Logger::info('Released expired payment codes', [
             'released_count' => $released_count,
         ]);
     }

@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
  * Abstract class cho parser thông báo ngân hàng
  * Mỗi ngân hàng sẽ có parser riêng kế thừa từ class này
  */
-abstract class WC_BankNotify_Parser_Abstract
+abstract class Taphoai_BankNotify_Parser_Abstract
 {
     /**
      * Message body từ webhook
@@ -119,4 +119,8 @@ abstract class WC_BankNotify_Parser_Abstract
     {
         return preg_replace('/[^0-9]/', '', $str);
     }
+}
+
+if (!class_exists('WC_BankNotify_Parser_Abstract', false)) {
+    class_alias('Taphoai_BankNotify_Parser_Abstract', 'WC_BankNotify_Parser_Abstract');
 }

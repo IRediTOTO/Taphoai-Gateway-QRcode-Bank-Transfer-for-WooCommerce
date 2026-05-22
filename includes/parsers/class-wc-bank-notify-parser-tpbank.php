@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 /**
  * Parser cho thông báo từ TPBank
  */
-class WC_BankNotify_Parser_TPBank extends WC_BankNotify_Parser_Abstract
+class Taphoai_BankNotify_Parser_TPBank extends Taphoai_BankNotify_Parser_Abstract
 {
     /**
      * Kiểm tra xem message có phải từ TPBank không
@@ -133,4 +133,8 @@ class WC_BankNotify_Parser_TPBank extends WC_BankNotify_Parser_Abstract
     {
         return 'TPBANK';
     }
+}
+
+if (!class_exists('WC_BankNotify_Parser_TPBank', false)) {
+    class_alias('Taphoai_BankNotify_Parser_TPBank', 'WC_BankNotify_Parser_TPBank');
 }

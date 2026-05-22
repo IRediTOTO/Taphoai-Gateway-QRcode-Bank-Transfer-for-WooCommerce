@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WC_Gateway_BankNotify extends WC_Payment_Gateway
+class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
 {
     public $displayed_bank_name;
 
@@ -312,8 +312,10 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
         }
 
         $logo_key = $this->get_field_key('logo');
-        if (!empty($_POST[$logo_key])) {
-            $_POST[$logo_key] = esc_url_raw(set_url_scheme(wp_unslash($_POST[$logo_key])));
+        $posted_logo = filter_input(INPUT_POST, $logo_key, FILTER_UNSAFE_RAW);
+        if ($posted_logo !== null && $posted_logo !== false && $posted_logo !== '') {
+            $logo_value = sanitize_url(wp_unslash($posted_logo));
+            $_POST[$logo_key] = esc_url_raw(set_url_scheme($logo_value));
         }
 
         $required_fields = [
@@ -462,11 +464,11 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
 
     public function process_payment($order_id)
     {
-        WC_BankNotify_Logger::info('Processing payment for order', ['order_id' => $order_id]);
+        Taphoai_BankNotify_Logger::info('Processing payment for order', ['order_id' => $order_id]);
 
         $order = wc_get_order($order_id);
         if (!$order) {
-            WC_BankNotify_Logger::error('Payment processing failed: order not found', ['order_id' => $order_id]);
+            Taphoai_BankNotify_Logger::error('Payment processing failed: order not found', ['order_id' => $order_id]);
 
             return [
                 'result' => 'failure',
@@ -475,7 +477,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
 
         $this->update_order_status_and_clear_cart($order);
 
-        WC_BankNotify_Logger::debug('Payment processed successfully', [
+        Taphoai_BankNotify_Logger::debug('Payment processed successfully', [
             'order_id' => $order_id,
             'order_status' => $order->get_status(),
         ]);
@@ -608,7 +610,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
 
         $mode = $this->get_option('payment_code_mode', 'prefix');
 
-        WC_BankNotify_Logger::debug('Getting payment code for order', [
+        Taphoai_BankNotify_Logger::debug('Getting payment code for order', [
             'order_id' => $order_id,
             'mode' => $mode,
         ]);
@@ -616,7 +618,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
         // Kiểm tra xem order đã có mã chưa
         $existing_code = $order->get_meta('_bank_notify_payment_code');
         if ($existing_code) {
-            WC_BankNotify_Logger::debug('Using existing payment code', [
+            Taphoai_BankNotify_Logger::debug('Using existing payment code', [
                 'order_id' => $order_id,
                 'code' => $existing_code,
             ]);
@@ -624,7 +626,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
         } else {
             if ($mode === 'natural') {
                 // Natural mode - get code from pool
-                $manager = new WC_BankNotify_Payment_Code_Manager();
+                $manager = new Taphoai_BankNotify_Payment_Code_Manager();
                 $code = $manager->get_available_code($order_id);
 
                 if (!$code) {
@@ -633,12 +635,12 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
                     $payment_mode = 'prefix';
 
                     // Log warning
-                    WC_BankNotify_Logger::warning('No available payment codes. Falling back to prefix mode', [
+                    Taphoai_BankNotify_Logger::warning('No available payment codes. Falling back to prefix mode', [
                         'order_id' => $order_id,
                         'fallback_code' => $code,
                     ]);
                 } else {
-                    WC_BankNotify_Logger::info('Assigned natural payment code from pool', [
+                    Taphoai_BankNotify_Logger::info('Assigned natural payment code from pool', [
                         'order_id' => $order_id,
                         'code' => $code,
                     ]);
@@ -655,7 +657,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
                 // Prefix mode
                 $remark = $this->get_option('pay_code_prefix') . $order_id;
 
-                WC_BankNotify_Logger::info('Generated prefix payment code', [
+                Taphoai_BankNotify_Logger::info('Generated prefix payment code', [
                     'order_id' => $order_id,
                     'code' => $remark,
                     'prefix' => $this->get_option('pay_code_prefix'),
@@ -673,7 +675,7 @@ class WC_Gateway_BankNotify extends WC_Payment_Gateway
             $original_remark = $remark;
             $remark = 'SEVQR ' . $remark;
 
-            WC_BankNotify_Logger::debug('Applied SEVQR prefix for VietinBank/ABBANK', [
+            Taphoai_BankNotify_Logger::debug('Applied SEVQR prefix for VietinBank/ABBANK', [
                 'order_id' => $order_id,
                 'original' => $original_remark,
                 'modified' => $remark,
@@ -965,4 +967,8 @@ curl -X POST "<?php echo esc_html($webhook_url); ?>" \
         return ob_get_clean();
     }
 
+}
+
+if (!class_exists('WC_Gateway_BankNotify', false)) {
+    class_alias('Taphoai_Gateway_BankNotify', 'WC_Gateway_BankNotify');
 }

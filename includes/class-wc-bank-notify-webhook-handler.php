@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 /**
  * Xử lý webhook thanh toán từ ứng dụng điện thoại
  */
-class WC_BankNotify_Webhook_Handler
+class Taphoai_BankNotify_Webhook_Handler
 {
     /**
      * Constructor
@@ -48,26 +48,26 @@ class WC_BankNotify_Webhook_Handler
 
         // Nếu không tìm thấy API key ở bất kỳ đâu
         if (empty($provided_key)) {
-            WC_BankNotify_Logger::warning('Webhook authentication failed: No API key provided');
+            Taphoai_BankNotify_Logger::warning('Webhook authentication failed: No API key provided');
             return new WP_Error('no_auth', 'Missing API key. Provide via Authorization: Bearer <api_key>.', ['status' => 401]);
         }
 
         // Lấy API key từ settings
-        $gateway = new WC_Gateway_BankNotify();
+        $gateway = new Taphoai_Gateway_BankNotify();
         $stored_key = $gateway->get_option('webhook_api_key');
 
         if (empty($stored_key)) {
-            WC_BankNotify_Logger::error('Webhook authentication failed: API key not configured');
+            Taphoai_BankNotify_Logger::error('Webhook authentication failed: API key not configured');
             return new WP_Error('api_key_not_configured', 'API key not configured', ['status' => 500]);
         }
 
         // So sánh API key
         if (!hash_equals((string) $stored_key, (string) $provided_key)) {
-            WC_BankNotify_Logger::warning('Webhook authentication failed: Invalid API key provided');
+            Taphoai_BankNotify_Logger::warning('Webhook authentication failed: Invalid API key provided');
             return new WP_Error('invalid_api_key', 'Invalid API key', ['status' => 403]);
         }
 
-        WC_BankNotify_Logger::debug('Webhook authentication successful');
+        Taphoai_BankNotify_Logger::debug('Webhook authentication successful');
         return true;
     }
 
@@ -79,23 +79,23 @@ class WC_BankNotify_Webhook_Handler
         // Lấy body text
         $body = $request->get_body();
 
-        WC_BankNotify_Logger::info('Webhook received', [
+        Taphoai_BankNotify_Logger::info('Webhook received', [
             'body_length' => strlen($body),
             'ip' => isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown',
         ]);
 
         if (empty($body)) {
-            WC_BankNotify_Logger::warning('Webhook rejected: Empty request body');
+            Taphoai_BankNotify_Logger::warning('Webhook rejected: Empty request body');
             return new WP_Error('empty_body', 'Empty request body', ['status' => 400]);
         }
 
-        WC_BankNotify_Logger::debug('Webhook body content', ['body' => $body]);
+        Taphoai_BankNotify_Logger::debug('Webhook body content', ['body' => $body]);
 
         // Sử dụng Parser Factory để tự động detect ngân hàng và parse
-        $parser = WC_BankNotify_Parser_Factory::create($body);
+        $parser = Taphoai_BankNotify_Parser_Factory::create($body);
         $parsed_data = $parser->parse();
 
-        WC_BankNotify_Logger::info('Webhook parsed by bank parser', [
+        Taphoai_BankNotify_Logger::info('Webhook parsed by bank parser', [
             'bank_name' => $parsed_data['bank_name'],
             'bank_code' => $parsed_data['bank_code'],
         ]);
@@ -104,14 +104,14 @@ class WC_BankNotify_Webhook_Handler
         $payment_code = $parsed_data['payment_code'];
 
         if (!$payment_code) {
-            WC_BankNotify_Logger::warning('Webhook rejected: Could not extract payment code', [
+            Taphoai_BankNotify_Logger::warning('Webhook rejected: Could not extract payment code', [
                 'body' => $body,
                 'bank' => $parsed_data['bank_name'],
             ]);
             return new WP_Error('no_payment_code', 'Could not extract payment code from body', ['status' => 400]);
         }
 
-        WC_BankNotify_Logger::info('Payment code extracted from webhook', [
+        Taphoai_BankNotify_Logger::info('Payment code extracted from webhook', [
             'payment_code' => $payment_code,
             'bank' => $parsed_data['bank_name'],
         ]);
@@ -120,11 +120,11 @@ class WC_BankNotify_Webhook_Handler
         $order = $this->find_order_by_payment_code($payment_code);
 
         if (!$order) {
-            WC_BankNotify_Logger::warning('Webhook rejected: Order not found', ['payment_code' => $payment_code]);
+            Taphoai_BankNotify_Logger::warning('Webhook rejected: Order not found', ['payment_code' => $payment_code]);
             return new WP_Error('order_not_found', 'Order not found for payment code: ' . $payment_code, ['status' => 404]);
         }
 
-        WC_BankNotify_Logger::info('Order found for payment code', [
+        Taphoai_BankNotify_Logger::info('Order found for payment code', [
             'order_id' => $order->get_id(),
             'payment_code' => $payment_code,
             'order_status' => $order->get_status(),
@@ -134,7 +134,7 @@ class WC_BankNotify_Webhook_Handler
         $amount = $parsed_data['amount'];
 
         if (!$amount) {
-            WC_BankNotify_Logger::warning('Webhook rejected: Could not extract amount', [
+            Taphoai_BankNotify_Logger::warning('Webhook rejected: Could not extract amount', [
                 'order_id' => $order->get_id(),
                 'body' => $body,
                 'bank' => $parsed_data['bank_name'],
@@ -142,7 +142,7 @@ class WC_BankNotify_Webhook_Handler
             return new WP_Error('no_amount', 'Could not extract amount from body', ['status' => 400]);
         }
 
-        WC_BankNotify_Logger::info('Amount extracted from webhook', [
+        Taphoai_BankNotify_Logger::info('Amount extracted from webhook', [
             'order_id' => $order->get_id(),
             'amount' => $amount,
             'order_total' => $order->get_total(),
@@ -151,7 +151,7 @@ class WC_BankNotify_Webhook_Handler
 
         // Nếu đơn không còn chờ thanh toán, ghi nhận khoản chuyển phát sinh thêm.
         if (!$order->has_status('on-hold')) {
-            WC_BankNotify_Logger::info('Webhook received for already processed order', [
+            Taphoai_BankNotify_Logger::info('Webhook received for already processed order', [
                 'order_id' => $order->get_id(),
                 'current_status' => $order->get_status(),
                 'amount' => $amount,
@@ -182,7 +182,7 @@ class WC_BankNotify_Webhook_Handler
         if ($amount + $tolerance < $order_total) {
             $short_amount = $order_total - $amount;
 
-            WC_BankNotify_Logger::error('Webhook rejected: Underpaid amount', [
+            Taphoai_BankNotify_Logger::error('Webhook rejected: Underpaid amount', [
                 'order_id' => $order->get_id(),
                 'received_amount' => $amount,
                 'expected_amount' => $order_total,
@@ -211,7 +211,7 @@ class WC_BankNotify_Webhook_Handler
         if ($amount - $order_total > $tolerance) {
             $overpaid_amount = $amount - $order_total;
 
-            WC_BankNotify_Logger::warning('Webhook accepted: Overpaid amount', [
+            Taphoai_BankNotify_Logger::warning('Webhook accepted: Overpaid amount', [
                 'order_id' => $order->get_id(),
                 'received_amount' => $amount,
                 'expected_amount' => $order_total,
@@ -234,13 +234,13 @@ class WC_BankNotify_Webhook_Handler
         $account_number = $parsed_data['account_number'];
 
         if ($account_number) {
-            WC_BankNotify_Logger::debug('Account number extracted from webhook', [
+            Taphoai_BankNotify_Logger::debug('Account number extracted from webhook', [
                 'order_id' => $order->get_id(),
                 'account_number' => $account_number,
                 'bank' => $parsed_data['bank_name'],
             ]);
             // Kiểm tra số tài khoản có khớp với settings không
-            $gateway = new WC_Gateway_BankNotify();
+            $gateway = new Taphoai_Gateway_BankNotify();
             $configured_account = $gateway->get_option('bank_account_number');
 
             // Loại bỏ khoảng trắng và ký tự đặc biệt để so sánh
@@ -252,7 +252,7 @@ class WC_BankNotify_Webhook_Handler
             $configured_last_4 = substr($configured_account_clean, -4);
 
             if ($account_last_4 !== $configured_last_4) {
-                WC_BankNotify_Logger::error('Webhook rejected: Account number mismatch', [
+                Taphoai_BankNotify_Logger::error('Webhook rejected: Account number mismatch', [
                     'order_id' => $order->get_id(),
                     'received_last_4' => $account_last_4,
                     'expected_last_4' => $configured_last_4,
@@ -273,7 +273,7 @@ class WC_BankNotify_Webhook_Handler
                 ), ['status' => 400]);
             }
 
-            WC_BankNotify_Logger::debug('Account number verification passed', [
+            Taphoai_BankNotify_Logger::debug('Account number verification passed', [
                 'order_id' => $order->get_id(),
             ]);
         }
@@ -282,7 +282,7 @@ class WC_BankNotify_Webhook_Handler
         $result = $this->update_order_status($order, $body, $amount);
 
         if ($result) {
-            WC_BankNotify_Logger::info('Order updated successfully via webhook', [
+            Taphoai_BankNotify_Logger::info('Order updated successfully via webhook', [
                 'order_id' => $order->get_id(),
                 'new_status' => $order->get_status(),
                 'amount' => $amount,
@@ -296,7 +296,7 @@ class WC_BankNotify_Webhook_Handler
                 'amount' => $amount,
             ], 200);
         } else {
-            WC_BankNotify_Logger::error('Failed to update order via webhook', [
+            Taphoai_BankNotify_Logger::error('Failed to update order via webhook', [
                 'order_id' => $order->get_id(),
             ]);
             return new WP_Error('update_failed', 'Failed to update order', ['status' => 500]);
@@ -324,7 +324,7 @@ class WC_BankNotify_Webhook_Handler
 
         // Nếu không tìm thấy, thử tìm theo pattern "tiền tố + order ID"
         // Trường hợp này xảy ra khi hết mã thanh toán và fallback về prefix mode
-        $gateway = new WC_Gateway_BankNotify();
+        $gateway = new Taphoai_Gateway_BankNotify();
         $prefix = $gateway->get_option('pay_code_prefix', 'DH');
 
         // Kiểm tra xem payment_code có bắt đầu bằng prefix không
@@ -338,7 +338,7 @@ class WC_BankNotify_Webhook_Handler
 
                 // Kiểm tra order tồn tại và sử dụng payment gateway này
                 if ($order && $order->get_payment_method() === 'bank_notify') {
-                    WC_BankNotify_Logger::info('Order found by prefix pattern fallback', [
+                    Taphoai_BankNotify_Logger::info('Order found by prefix pattern fallback', [
                         'payment_code' => $payment_code,
                         'order_id' => $order_id,
                         'prefix' => $prefix,
@@ -349,7 +349,7 @@ class WC_BankNotify_Webhook_Handler
             }
         }
 
-        WC_BankNotify_Logger::debug('Order not found for payment code', [
+        Taphoai_BankNotify_Logger::debug('Order not found for payment code', [
             'payment_code' => $payment_code,
             'tried_prefix' => $prefix,
         ]);
@@ -363,10 +363,10 @@ class WC_BankNotify_Webhook_Handler
     private function update_order_status($order, $webhook_body, $amount = null)
     {
         // Lấy trạng thái mong muốn từ settings
-        $gateway = new WC_Gateway_BankNotify();
+        $gateway = new Taphoai_Gateway_BankNotify();
         $target_status = $gateway->get_option('order_when_completed', 'processing');
 
-        WC_BankNotify_Logger::info('Updating order status', [
+        Taphoai_BankNotify_Logger::info('Updating order status', [
             'order_id' => $order->get_id(),
             'current_status' => $order->get_status(),
             'target_status' => $target_status,
@@ -382,7 +382,7 @@ class WC_BankNotify_Webhook_Handler
             $note_parts[] = sprintf('Số tiền: %s VND', number_format($amount, 0, ',', '.'));
         }
 
-        if (WC_BankNotify_Logger::is_enabled()) {
+        if (Taphoai_BankNotify_Logger::is_enabled()) {
             $note_parts[] = sprintf('Nội dung: %s', sanitize_textarea_field(substr($webhook_body, 0, 200)));
         }
 
@@ -399,7 +399,7 @@ class WC_BankNotify_Webhook_Handler
         $order->save();
         $this->mark_order_payment_code_used($order);
 
-        WC_BankNotify_Logger::info('Order status updated successfully', [
+        Taphoai_BankNotify_Logger::info('Order status updated successfully', [
             'order_id' => $order->get_id(),
             'new_status' => $order->get_status(),
         ]);
@@ -420,7 +420,7 @@ class WC_BankNotify_Webhook_Handler
             sprintf('Số tiền nhận thêm: %s VND.', number_format($amount, 0, ',', '.')),
         ];
 
-        if (WC_BankNotify_Logger::is_enabled()) {
+        if (Taphoai_BankNotify_Logger::is_enabled()) {
             $note_parts[] = sprintf('Nội dung: %s', sanitize_textarea_field(substr($webhook_body, 0, 200)));
         }
 
@@ -439,10 +439,14 @@ class WC_BankNotify_Webhook_Handler
             return;
         }
 
-        $manager = new WC_BankNotify_Payment_Code_Manager();
+        $manager = new Taphoai_BankNotify_Payment_Code_Manager();
         if ($manager->mark_code_as_used($code)) {
             $order->update_meta_data('_bank_notify_code_used_at', current_time('mysql'));
             $order->save();
         }
     }
+}
+
+if (!class_exists('WC_BankNotify_Webhook_Handler', false)) {
+    class_alias('Taphoai_BankNotify_Webhook_Handler', 'WC_BankNotify_Webhook_Handler');
 }

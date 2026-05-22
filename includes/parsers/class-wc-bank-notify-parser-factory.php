@@ -7,32 +7,32 @@ if (!defined('ABSPATH')) {
 /**
  * Factory class để tự động detect và tạo parser phù hợp
  */
-class WC_BankNotify_Parser_Factory
+class Taphoai_BankNotify_Parser_Factory
 {
     /**
      * Danh sách các parser classes
      */
     private static $parsers = [
-        'WC_BankNotify_Parser_MBBank',
-        'WC_BankNotify_Parser_TPBank',
+        'Taphoai_BankNotify_Parser_MBBank',
+        'Taphoai_BankNotify_Parser_TPBank',
     ];
 
     /**
      * Tạo parser phù hợp dựa trên message body
      * 
      * @param string $body Message body từ webhook
-     * @return WC_BankNotify_Parser_Abstract
+     * @return Taphoai_BankNotify_Parser_Abstract
      */
     public static function create($body)
     {
-        WC_BankNotify_Logger::debug('Parser Factory: Detecting bank from message', [
+        Taphoai_BankNotify_Logger::debug('Parser Factory: Detecting bank from message', [
             'body_preview' => substr($body, 0, 100),
         ]);
 
         // Loop qua tất cả parsers và tìm parser phù hợp
         foreach (self::$parsers as $parser_class) {
             if (!class_exists($parser_class)) {
-                WC_BankNotify_Logger::warning('Parser Factory: Parser class not found', [
+                Taphoai_BankNotify_Logger::warning('Parser Factory: Parser class not found', [
                     'class' => $parser_class,
                 ]);
                 continue;
@@ -41,7 +41,7 @@ class WC_BankNotify_Parser_Factory
             $parser = new $parser_class($body);
 
             if ($parser->detect()) {
-                WC_BankNotify_Logger::info('Parser Factory: Bank detected', [
+                Taphoai_BankNotify_Logger::info('Parser Factory: Bank detected', [
                     'parser' => $parser_class,
                     'bank_name' => $parser->get_bank_name(),
                     'bank_code' => $parser->get_bank_code(),
@@ -51,8 +51,8 @@ class WC_BankNotify_Parser_Factory
         }
 
         // Nếu không tìm thấy parser phù hợp, sử dụng TPBank làm default
-        WC_BankNotify_Logger::warning('Parser Factory: No specific parser detected, using default TPBank parser');
-        return new WC_BankNotify_Parser_TPBank($body);
+        Taphoai_BankNotify_Logger::warning('Parser Factory: No specific parser detected, using default TPBank parser');
+        return new Taphoai_BankNotify_Parser_TPBank($body);
     }
 
     /**
@@ -66,7 +66,7 @@ class WC_BankNotify_Parser_Factory
             // Thêm vào đầu mảng để ưu tiên parser mới
             array_unshift(self::$parsers, $parser_class);
 
-            WC_BankNotify_Logger::debug('Parser Factory: New parser registered', [
+            Taphoai_BankNotify_Logger::debug('Parser Factory: New parser registered', [
                 'parser' => $parser_class,
             ]);
         }
@@ -105,4 +105,8 @@ class WC_BankNotify_Parser_Factory
 
         return $banks;
     }
+}
+
+if (!class_exists('WC_BankNotify_Parser_Factory', false)) {
+    class_alias('Taphoai_BankNotify_Parser_Factory', 'WC_BankNotify_Parser_Factory');
 }

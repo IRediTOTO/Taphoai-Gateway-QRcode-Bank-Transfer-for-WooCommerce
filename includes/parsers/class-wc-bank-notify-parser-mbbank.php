@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
  * - SD: Số dư (Balance)
  * - ND: Nội dung (Description/Content) - chứa payment code
  */
-class WC_BankNotify_Parser_MBBank extends WC_BankNotify_Parser_Abstract
+class Taphoai_BankNotify_Parser_MBBank extends Taphoai_BankNotify_Parser_Abstract
 {
     /**
      * Kiểm tra xem message có phải từ MBBank không
@@ -165,4 +165,8 @@ class WC_BankNotify_Parser_MBBank extends WC_BankNotify_Parser_Abstract
 
         return null;
     }
+}
+
+if (!class_exists('WC_BankNotify_Parser_MBBank', false)) {
+    class_alias('Taphoai_BankNotify_Parser_MBBank', 'WC_BankNotify_Parser_MBBank');
 }

@@ -8,7 +8,9 @@ if (!class_exists('WP_List_Table')) {
     require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-class WC_BankNotify_Payment_Codes_List_Table extends WP_List_Table
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom list table reads and bulk actions use the plugin payment-code table.
+
+class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
 {
     private $manager;
     private $db;
@@ -21,8 +23,8 @@ class WC_BankNotify_Payment_Codes_List_Table extends WP_List_Table
             'ajax'     => false,
         ]);
 
-        $this->manager = new WC_BankNotify_Payment_Code_Manager();
-        $this->db = new WC_BankNotify_DB();
+        $this->manager = new Taphoai_BankNotify_Payment_Code_Manager();
+        $this->db = new Taphoai_BankNotify_DB();
     }
 
     /**
@@ -489,4 +491,8 @@ class WC_BankNotify_Payment_Codes_List_Table extends WP_List_Table
         wp_safe_redirect(remove_query_arg(['action', 'action2', 'codes', '_wpnonce', '_wp_http_referer']));
         exit;
     }
+}
+
+if (!class_exists('WC_BankNotify_Payment_Codes_List_Table', false)) {
+    class_alias('Taphoai_BankNotify_Payment_Codes_List_Table', 'WC_BankNotify_Payment_Codes_List_Table');
 }

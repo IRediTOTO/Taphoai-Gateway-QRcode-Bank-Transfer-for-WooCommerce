@@ -4,11 +4,11 @@ if (!defined('ABSPATH')) {
 }
 
 // Check if there are any codes in the system
-$bank_notify_manager = new WC_BankNotify_Payment_Code_Manager();
+$bank_notify_manager = new Taphoai_BankNotify_Payment_Code_Manager();
 $bank_notify_stats = $bank_notify_manager->get_stats(false);
 
 // Create list table instance
-$bank_notify_list_table = new WC_BankNotify_Payment_Codes_List_Table();
+$bank_notify_list_table = new Taphoai_BankNotify_Payment_Codes_List_Table();
 $bank_notify_list_table->prepare_items();
 ?>
 

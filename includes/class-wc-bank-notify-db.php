@@ -4,7 +4,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WC_BankNotify_DB
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Custom plugin table operations require direct $wpdb calls.
+
+class Taphoai_BankNotify_DB
 {
     private $table_name;
 
@@ -180,4 +182,8 @@ class WC_BankNotify_DB
             $wpdb->prepare('SELECT code FROM %i ORDER BY code ASC', $this->table_name)
         );
     }
+}
+
+if (!class_exists('WC_BankNotify_DB', false)) {
+    class_alias('Taphoai_BankNotify_DB', 'WC_BankNotify_DB');
 }

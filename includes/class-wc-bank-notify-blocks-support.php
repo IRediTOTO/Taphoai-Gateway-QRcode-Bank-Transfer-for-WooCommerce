@@ -6,7 +6,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-final class WC_BankNotify_Blocks_Support extends AbstractPaymentMethodType
+final class Taphoai_BankNotify_Blocks_Support extends AbstractPaymentMethodType
 {
     protected $name = 'bank_notify';
 
@@ -55,4 +55,8 @@ final class WC_BankNotify_Blocks_Support extends AbstractPaymentMethodType
             'supports' => $this->get_supported_features(),
         ];
     }
+}
+
+if (!class_exists('WC_BankNotify_Blocks_Support', false)) {
+    class_alias('Taphoai_BankNotify_Blocks_Support', 'WC_BankNotify_Blocks_Support');
 }

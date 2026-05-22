@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
  * Logger class for Bank Notify plugin
  * Handles debug logging to bank-notify.log file
  */
-class WC_BankNotify_Logger
+class Taphoai_BankNotify_Logger
 {
     /**
      * Log file name
@@ -40,7 +40,7 @@ class WC_BankNotify_Logger
     /**
      * Get gateway instance
      *
-     * @return WC_Gateway_BankNotify|null
+     * @return Taphoai_Gateway_BankNotify|null
      */
     private static function get_gateway()
     {
@@ -167,4 +167,8 @@ class WC_BankNotify_Logger
 
         return $files[0];
     }
+}
+
+if (!class_exists('WC_BankNotify_Logger', false)) {
+    class_alias('Taphoai_BankNotify_Logger', 'WC_BankNotify_Logger');
 }

@@ -4,14 +4,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WC_BankNotify_Payment_Code_Manager
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom payment-code pool table operations require direct $wpdb calls.
+
+class Taphoai_BankNotify_Payment_Code_Manager
 {
     private $db;
     private $table_name;
 
     public function __construct()
     {
-        $this->db = new WC_BankNotify_DB();
+        $this->db = new Taphoai_BankNotify_DB();
         $this->table_name = $this->db->get_table_name();
     }
 
@@ -23,7 +25,7 @@ class WC_BankNotify_Payment_Code_Manager
     {
         global $wpdb;
 
-        WC_BankNotify_Logger::debug('Attempting to get available payment code', ['order_id' => $order_id]);
+        Taphoai_BankNotify_Logger::debug('Attempting to get available payment code', ['order_id' => $order_id]);
 
         // Start transaction
         $wpdb->query('START TRANSACTION');
@@ -43,7 +45,7 @@ class WC_BankNotify_Payment_Code_Manager
 
             if (!$code_row) {
                 $wpdb->query('ROLLBACK');
-                WC_BankNotify_Logger::warning('No available payment codes; caller should fall back to prefix mode', ['order_id' => $order_id]);
+                Taphoai_BankNotify_Logger::warning('No available payment codes; caller should fall back to prefix mode', ['order_id' => $order_id]);
                 return false;
             }
 
@@ -62,7 +64,7 @@ class WC_BankNotify_Payment_Code_Manager
 
             if ($updated === false) {
                 $wpdb->query('ROLLBACK');
-                WC_BankNotify_Logger::error('Failed to update payment code status', [
+                Taphoai_BankNotify_Logger::error('Failed to update payment code status', [
                     'order_id' => $order_id,
                     'code' => $code_row->code,
                 ]);
@@ -72,7 +74,7 @@ class WC_BankNotify_Payment_Code_Manager
             // Commit transaction
             $wpdb->query('COMMIT');
 
-            WC_BankNotify_Logger::info('Payment code assigned successfully', [
+            Taphoai_BankNotify_Logger::info('Payment code assigned successfully', [
                 'order_id' => $order_id,
                 'code' => $code_row->code,
             ]);
@@ -81,7 +83,7 @@ class WC_BankNotify_Payment_Code_Manager
 
         } catch (Exception $e) {
             $wpdb->query('ROLLBACK');
-            WC_BankNotify_Logger::error('Exception while getting available code', [
+            Taphoai_BankNotify_Logger::error('Exception while getting available code', [
                 'order_id' => $order_id,
                 'error' => $e->getMessage(),
             ]);
@@ -96,7 +98,7 @@ class WC_BankNotify_Payment_Code_Manager
     {
         global $wpdb;
 
-        WC_BankNotify_Logger::debug('Releasing payment code', ['code' => $code]);
+        Taphoai_BankNotify_Logger::debug('Releasing payment code', ['code' => $code]);
 
         $order_id = $wpdb->get_var(
             $wpdb->prepare(
@@ -120,7 +122,7 @@ class WC_BankNotify_Payment_Code_Manager
 
         if ($updated !== false) {
             delete_transient('bank_notify_stats_cache');
-            WC_BankNotify_Logger::info('Payment code released successfully', ['code' => $code]);
+            Taphoai_BankNotify_Logger::info('Payment code released successfully', ['code' => $code]);
 
             if ($order_id) {
                 $order = wc_get_order($order_id);
@@ -130,7 +132,7 @@ class WC_BankNotify_Payment_Code_Manager
                 }
             }
         } else {
-            WC_BankNotify_Logger::warning('Failed to release payment code', ['code' => $code]);
+            Taphoai_BankNotify_Logger::warning('Failed to release payment code', ['code' => $code]);
         }
 
         return $updated !== false;
@@ -354,7 +356,7 @@ class WC_BankNotify_Payment_Code_Manager
                 $stats['imported']++;
             } else {
                 $stats['errors']++;
-                WC_BankNotify_Logger::error('Failed to insert payment code', [
+                Taphoai_BankNotify_Logger::error('Failed to insert payment code', [
                     'code' => $code,
                     'db_error' => $wpdb->last_error,
                 ]);
@@ -500,4 +502,8 @@ class WC_BankNotify_Payment_Code_Manager
         $stats = $this->get_stats();
         return $stats['available'] > 0;
     }
+}
+
+if (!class_exists('WC_BankNotify_Payment_Code_Manager', false)) {
+    class_alias('Taphoai_BankNotify_Payment_Code_Manager', 'WC_BankNotify_Payment_Code_Manager');
 }

@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$bank_notify_manager = new WC_BankNotify_Payment_Code_Manager();
+$bank_notify_manager = new Taphoai_BankNotify_Payment_Code_Manager();
 ?>
 
 <!-- Import Codes Section -->

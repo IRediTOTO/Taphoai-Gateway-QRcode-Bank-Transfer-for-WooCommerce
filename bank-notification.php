@@ -224,6 +224,7 @@ function bank_notify_check_codes_notice()
     $allowed_screens = [
         'woocommerce_page_wc-settings',
         'woocommerce_page_bank-notify-payment-codes',
+        'toplevel_page_bank-notify-payment-codes',
     ];
 
     if (!in_array($screen_id, $allowed_screens, true)) {
@@ -392,16 +393,17 @@ add_action('admin_menu', 'bank_notify_add_admin_menu', 99);
 
 function bank_notify_add_admin_menu()
 {
-    add_submenu_page(
-        'woocommerce',
+    add_menu_page(
         'Quản lý mã thanh toán',
         'Mã thanh toán',
         'read',
         'bank-notify-payment-codes',
-        'bank_notify_payment_codes_page'
+        'bank_notify_payment_codes_page',
+        '',
+        null
     );
 
-    remove_submenu_page('woocommerce', 'bank-notify-payment-codes');
+    remove_menu_page('bank-notify-payment-codes');
 }
 
 function bank_notify_payment_codes_page()
@@ -415,7 +417,7 @@ add_action('admin_enqueue_scripts', 'bank_notify_enqueue_admin_scripts');
 function bank_notify_enqueue_admin_scripts($hook)
 {
     // Only load on payment codes page
-    if ($hook !== 'woocommerce_page_bank-notify-payment-codes') {
+    if (!in_array($hook, ['woocommerce_page_bank-notify-payment-codes', 'toplevel_page_bank-notify-payment-codes'], true)) {
         return;
     }
 

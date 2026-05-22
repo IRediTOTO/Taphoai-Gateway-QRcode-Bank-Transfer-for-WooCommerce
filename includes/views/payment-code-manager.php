@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (!current_user_can('manage_woocommerce')) {
+if (!bank_notify_current_user_can_manage()) {
     wp_die(esc_html__('You do not have permission to access this page.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
 }
 

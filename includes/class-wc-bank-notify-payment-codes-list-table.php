@@ -427,7 +427,7 @@ class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
             return;
         }
 
-        if (!current_user_can('manage_woocommerce')) {
+        if (!bank_notify_current_user_can_manage()) {
             return;
         }
 

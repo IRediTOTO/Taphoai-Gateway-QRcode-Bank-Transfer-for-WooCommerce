@@ -69,6 +69,11 @@ function bank_notify_add_gateway_class($gateways)
     return $gateways;
 }
 
+function bank_notify_current_user_can_manage(): bool
+{
+    return current_user_can('manage_woocommerce') || current_user_can('manage_options');
+}
+
 function bank_notify_init_gateway_class()
 {
     if (!class_exists('WooCommerce')) {
@@ -314,7 +319,7 @@ function bank_notify_handle_log_actions()
 
     // View log
     if ($page === 'wc-settings' && $section === 'bank_notify' && $view_log === '1') {
-        if (!current_user_can('manage_woocommerce')) {
+        if (!bank_notify_current_user_can_manage()) {
             wp_die(esc_html__('You do not have permission to view this log.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
@@ -345,7 +350,7 @@ function bank_notify_handle_log_actions()
 
     // Clear log
     if ($page === 'wc-settings' && $section === 'bank_notify' && $clear_log === '1') {
-        if (!current_user_can('manage_woocommerce')) {
+        if (!bank_notify_current_user_can_manage()) {
             wp_die(esc_html__('You do not have permission to clear this log.', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'));
         }
 
@@ -391,7 +396,7 @@ function bank_notify_add_admin_menu()
         'woocommerce',
         'Quản lý mã thanh toán',
         'Mã thanh toán',
-        'manage_woocommerce',
+        'read',
         'bank-notify-payment-codes',
         'bank_notify_payment_codes_page'
     );
@@ -454,7 +459,7 @@ function bank_notify_delete_single_code_handler()
 {
     check_ajax_referer('bank_notify_admin_action', 'nonce');
 
-    if (!current_user_can('manage_woocommerce')) {
+    if (!bank_notify_current_user_can_manage()) {
         wp_send_json_error(['message' => 'Unauthorized']);
     }
 
@@ -482,7 +487,7 @@ function bank_notify_release_single_code_handler()
 {
     check_ajax_referer('bank_notify_admin_action', 'nonce');
 
-    if (!current_user_can('manage_woocommerce')) {
+    if (!bank_notify_current_user_can_manage()) {
         wp_send_json_error(['message' => 'Unauthorized']);
     }
 

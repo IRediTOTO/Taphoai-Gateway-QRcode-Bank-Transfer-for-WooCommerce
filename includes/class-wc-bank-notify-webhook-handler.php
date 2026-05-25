@@ -308,18 +308,31 @@ class Taphoai_BankNotify_Webhook_Handler
      */
     private function find_order_by_payment_code($payment_code)
     {
-        // Tìm theo meta _bank_notify_payment_code trước
-        $args = [
-            'limit' => 1,
-            'meta_key' => '_bank_notify_payment_code',
-            'meta_value' => $payment_code,
-            'return' => 'ids',
-        ];
+        $payment_code = trim((string) $payment_code);
+        $code_candidates = array_filter(array_unique([
+            $payment_code,
+            preg_match('/^SEVQR\s+/i', $payment_code) ? preg_replace('/^SEVQR\s+/i', '', $payment_code) : null,
+            preg_match('/^SEVQR\s+/i', $payment_code) ? null : 'SEVQR ' . $payment_code,
+        ]));
 
-        $orders = wc_get_orders($args);
+        foreach (['_bank_notify_payment_code', '_bank_notify_transfer_content'] as $meta_key) {
+            foreach ($code_candidates as $candidate) {
+                $orders = wc_get_orders([
+                    'limit' => 1,
+                    'meta_key' => $meta_key,
+                    'meta_value' => $candidate,
+                    'return' => 'ids',
+                ]);
 
-        if (!empty($orders)) {
-            return wc_get_order($orders[0]);
+                if (!empty($orders)) {
+                    return wc_get_order($orders[0]);
+                }
+            }
+        }
+
+        $order = $this->find_order_by_contained_natural_payment_code($payment_code);
+        if ($order) {
+            return $order;
         }
 
         // Nếu không tìm thấy, thử tìm theo pattern "tiền tố + order ID"
@@ -355,6 +368,65 @@ class Taphoai_BankNotify_Webhook_Handler
         ]);
 
         return null;
+    }
+
+    /**
+     * Tìm đơn natural mode khi ngân hàng thêm metadata sau nội dung chuyển khoản.
+     */
+    private function find_order_by_contained_natural_payment_code($payment_code)
+    {
+        $orders = wc_get_orders([
+            'limit' => -1,
+            'status' => ['on-hold'],
+            'payment_method' => 'bank_notify',
+            'meta_key' => '_bank_notify_payment_mode',
+            'meta_value' => 'natural',
+            'return' => 'objects',
+        ]);
+
+        $matches = [];
+
+        foreach ($orders as $order) {
+            $code = trim((string) $order->get_meta('_bank_notify_payment_code'));
+            if (
+                $code === ''
+                || $this->get_payment_code_length($code) < Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE_LENGTH
+                || stripos($payment_code, $code) === false
+            ) {
+                continue;
+            }
+
+            $matches[] = [
+                'order' => $order,
+                'code' => $code,
+                'length' => strlen($code),
+            ];
+        }
+
+        if (empty($matches)) {
+            return null;
+        }
+
+        usort($matches, function ($a, $b) {
+            return $b['length'] <=> $a['length'];
+        });
+
+        Taphoai_BankNotify_Logger::info('Order found by contained natural payment code', [
+            'payment_code' => $payment_code,
+            'matched_code' => $matches[0]['code'],
+            'order_id' => $matches[0]['order']->get_id(),
+        ]);
+
+        return $matches[0]['order'];
+    }
+
+    private function get_payment_code_length($code)
+    {
+        if (function_exists('mb_strlen')) {
+            return mb_strlen($code, 'UTF-8');
+        }
+
+        return strlen($code);
     }
 
     /**

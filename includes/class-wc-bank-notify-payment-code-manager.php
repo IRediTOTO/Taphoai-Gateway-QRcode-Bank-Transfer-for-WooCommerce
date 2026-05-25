@@ -8,6 +8,8 @@ if (!defined('ABSPATH')) {
 
 class Taphoai_BankNotify_Payment_Code_Manager
 {
+    public const MIN_CODE_LENGTH = 12;
+
     private $db;
     private $table_name;
 
@@ -315,6 +317,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
             'total' => count($codes_array),
             'imported' => 0,
             'duplicates' => 0,
+            'too_short' => 0,
             'errors' => 0,
         ];
 
@@ -324,6 +327,11 @@ class Taphoai_BankNotify_Payment_Code_Manager
 
             // Skip empty codes
             if (empty($code)) {
+                continue;
+            }
+
+            if ($this->get_code_length($code) < self::MIN_CODE_LENGTH) {
+                $stats['too_short']++;
                 continue;
             }
 
@@ -367,6 +375,15 @@ class Taphoai_BankNotify_Payment_Code_Manager
         delete_transient('bank_notify_stats_cache');
 
         return $stats;
+    }
+
+    private function get_code_length($code)
+    {
+        if (function_exists('mb_strlen')) {
+            return mb_strlen($code, 'UTF-8');
+        }
+
+        return strlen($code);
     }
 
     /**

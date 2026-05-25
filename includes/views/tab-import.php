@@ -4,13 +4,14 @@ if (!defined('ABSPATH')) {
 }
 
 $bank_notify_manager = new Taphoai_BankNotify_Payment_Code_Manager();
+$bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE_LENGTH;
 ?>
 
 <!-- Import Codes Section -->
 <div class="bank-notify-import-section" style="margin: 30px 0;">
     <h2>Import mã thanh toán</h2>
     <p class="description">
-        Nhập danh sách mã thanh toán, mỗi mã một dòng. Hệ thống sẽ tự động bỏ qua các mã trùng lặp. Nên thêm ít nhất 500 mã để đảm bảo luôn có mã khả dụng cho khách hàng. Nếu hết mã khả dụng, hệ thống sẽ tự động chuyển về chế độ "Tiền tố + Mã đơn hàng". Mã có thể chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt (trừ xuống dòng).
+        Nhập danh sách mã thanh toán, mỗi mã một dòng. Hệ thống sẽ tự động bỏ qua các mã trùng lặp và mã ngắn hơn <?php echo esc_html($bank_notify_min_code_length); ?> ký tự. Nên thêm ít nhất 500 mã để đảm bảo luôn có mã khả dụng cho khách hàng. Nếu hết mã khả dụng, hệ thống sẽ tự động chuyển về chế độ "Tiền tố + Mã đơn hàng". Mã có thể chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt (trừ xuống dòng).
     </p>
 
     <form method="post" action="">
@@ -105,6 +106,7 @@ $bank_notify_manager = new Taphoai_BankNotify_Payment_Code_Manager();
         <li>Mỗi mã phải là duy nhất (unique).</li>
         <li>Nên import hàng ngàn mã để đảm bảo luôn có mã khả dụng.</li>
         <li>Nếu hết mã khả dụng, hệ thống sẽ tự động chuyển về chế độ "Tiền tố + Mã đơn hàng".</li>
+        <li>Mã phải có ít nhất <?php echo esc_html($bank_notify_min_code_length); ?> ký tự để tránh khớp nhầm nội dung chuyển khoản.</li>
         <li>Mã có thể chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt (trừ xuống dòng).</li>
     </ul>
 </div>

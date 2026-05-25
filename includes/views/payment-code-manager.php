@@ -26,9 +26,10 @@ if (isset($_POST['bank_notify_action'])) {
         $bank_notify_result = $bank_notify_manager->import_codes($bank_notify_codes_array);
 
         $bank_notify_message = sprintf(
-            'Đã import thành công %d mã. Trùng lặp: %d. Lỗi: %d.',
+            'Đã import thành công %d mã. Trùng lặp: %d. Quá ngắn: %d. Lỗi: %d.',
             $bank_notify_result['imported'],
             $bank_notify_result['duplicates'],
+            $bank_notify_result['too_short'],
             $bank_notify_result['errors']
         );
         $bank_notify_message_type = 'success';

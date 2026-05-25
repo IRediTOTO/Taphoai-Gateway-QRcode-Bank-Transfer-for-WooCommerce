@@ -58,6 +58,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         add_action('woocommerce_admin_field_bank_select_with_logo', [$this, 'generate_bank_select_with_logo_html']);
         add_action('woocommerce_admin_field_webhook_url_display', [$this, 'generate_webhook_url_display_html']);
         add_action('woocommerce_admin_field_logo_upload', [$this, 'generate_logo_upload_html']);
+        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_admin_order_transfer_content']);
     }
 
     public function init_form_fields()
@@ -616,6 +617,8 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         ]);
 
         // Kiểm tra xem order đã có mã chưa
+        $assigned_new_code = false;
+        $assigned_payment_mode = '';
         $existing_code = $order->get_meta('_bank_notify_payment_code');
         if ($existing_code) {
             Taphoai_BankNotify_Logger::debug('Using existing payment code', [
@@ -652,6 +655,8 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
                 $order->update_meta_data('_bank_notify_code_assigned_at', current_time('mysql'));
                 $order->save();
 
+                $assigned_new_code = true;
+                $assigned_payment_mode = $payment_mode;
                 $remark = $code;
             } else {
                 // Prefix mode
@@ -667,6 +672,9 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
                 $order->update_meta_data('_bank_notify_payment_mode', 'prefix');
                 $order->update_meta_data('_bank_notify_code_assigned_at', current_time('mysql'));
                 $order->save();
+
+                $assigned_new_code = true;
+                $assigned_payment_mode = 'prefix';
             }
         }
 
@@ -682,7 +690,63 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             ]);
         }
 
+        $stored_transfer_content = (string) $order->get_meta('_bank_notify_transfer_content');
+        if ($assigned_new_code) {
+            $this->store_order_transfer_content($order, $remark, $assigned_payment_mode);
+            $order->save();
+        } elseif ($stored_transfer_content !== $remark) {
+            $order->update_meta_data('_bank_notify_transfer_content', $remark);
+            $order->save();
+        }
+
         return $remark;
+    }
+
+    public function display_admin_order_transfer_content($order)
+    {
+        if (!$order instanceof WC_Order || $order->get_payment_method() !== $this->id) {
+            return;
+        }
+
+        $transfer_content = $order->get_meta('_bank_notify_transfer_content');
+        if (!$transfer_content) {
+            $transfer_content = $order->get_meta('_bank_notify_payment_code');
+            if ($transfer_content && in_array($this->bank_bin, ['970415', '970425'], true) && !preg_match('/^SEVQR\s+/i', $transfer_content)) {
+                $transfer_content = 'SEVQR ' . $transfer_content;
+            }
+        }
+
+        if (!$transfer_content) {
+            return;
+        }
+
+        $payment_mode = $order->get_meta('_bank_notify_payment_mode');
+        $assigned_at = $order->get_meta('_bank_notify_code_assigned_at');
+        ?>
+        <div class="bank-notify-admin-transfer-content" style="margin-top: 12px;">
+            <h4><?php echo esc_html__('Nội dung chuyển khoản', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'); ?></h4>
+            <p>
+                <strong style="font-size: 14px;"><?php echo esc_html($transfer_content); ?></strong>
+                <?php if ($payment_mode) : ?>
+                    <br><small><?php echo esc_html(sprintf('Chế độ mã: %s', $payment_mode === 'natural' ? 'Chuỗi tự nhiên' : 'Tiền tố + mã đơn hàng')); ?></small>
+                <?php endif; ?>
+                <?php if ($assigned_at) : ?>
+                    <br><small><?php echo esc_html(sprintf('Thời điểm cấp mã: %s', $assigned_at)); ?></small>
+                <?php endif; ?>
+            </p>
+        </div>
+        <?php
+    }
+
+    private function store_order_transfer_content($order, $transfer_content, $payment_mode)
+    {
+        $order->update_meta_data('_bank_notify_transfer_content', $transfer_content);
+
+        if ($payment_mode === 'natural') {
+            $order->add_order_note(
+                sprintf('Mã chuyển khoản chuỗi tự nhiên đã cấp cho đơn hàng: %s', $transfer_content)
+            );
+        }
     }
 
     private function update_order_status_and_clear_cart($order)

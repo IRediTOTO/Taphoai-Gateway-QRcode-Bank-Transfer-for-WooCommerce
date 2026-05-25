@@ -720,19 +720,11 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             return;
         }
 
-        $payment_mode = $order->get_meta('_bank_notify_payment_mode');
-        $assigned_at = $order->get_meta('_bank_notify_code_assigned_at');
         ?>
         <div class="bank-notify-admin-transfer-content" style="margin-top: 12px;">
             <h4><?php echo esc_html__('Nội dung chuyển khoản', 'taphoai-gateway-qrcode-bank-transfer-for-woocommerce'); ?></h4>
             <p>
-                <strong style="font-size: 14px;"><?php echo esc_html($transfer_content); ?></strong>
-                <?php if ($payment_mode) : ?>
-                    <br><small><?php echo esc_html(sprintf('Chế độ mã: %s', $payment_mode === 'natural' ? 'Chuỗi tự nhiên' : 'Tiền tố + mã đơn hàng')); ?></small>
-                <?php endif; ?>
-                <?php if ($assigned_at) : ?>
-                    <br><small><?php echo esc_html(sprintf('Thời điểm cấp mã: %s', $assigned_at)); ?></small>
-                <?php endif; ?>
+                <strong><?php echo esc_html($transfer_content); ?></strong>
             </p>
         </div>
         <?php

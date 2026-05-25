@@ -5,7 +5,7 @@ Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,6 +78,10 @@ No. Debug logs stay in the WooCommerce log system. The plugin does not upload de
 The order received page can be viewed by guest checkout customers. The public AJAX endpoint requires the order ID, order key, and nonce before returning order status or downloadable item information.
 
 == Changelog ==
+
+= 1.0.2 =
+
+* Simplified the admin order transfer content display.
 
 = 1.0.1 =
 

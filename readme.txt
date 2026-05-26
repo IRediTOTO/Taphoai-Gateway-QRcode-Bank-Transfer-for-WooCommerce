@@ -5,7 +5,7 @@ Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,6 +78,12 @@ No. Debug logs stay in the WooCommerce log system. The plugin does not upload de
 The order received page can be viewed by guest checkout customers. The public AJAX endpoint requires the order ID, order key, and nonce before returning order status or downloadable item information.
 
 == Changelog ==
+
+= 1.0.3 =
+
+* Improved TPBank webhook parsing for account number, transfer content, and received amount.
+* Added a danger-zone action to delete only available payment codes.
+* Refined payment-code admin styling with neutral colors and aligned icons.
 
 = 1.0.2 =
 

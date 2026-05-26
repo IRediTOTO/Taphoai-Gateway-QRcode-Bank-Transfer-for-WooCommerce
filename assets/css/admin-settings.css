@@ -84,3 +84,66 @@ h3.wc-settings-sub-title + p {
     color: #00a0d2;
     margin-right: 5px;
 }
+
+.bank-notify-tab-content .dashicons,
+.nav-tab-wrapper .dashicons {
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.bank-notify-tab-content .dashicons {
+    color: #50575e;
+}
+
+.nav-tab-wrapper .dashicons {
+    margin-right: 4px;
+}
+
+.bank-notify-icon-button {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+}
+
+.bank-notify-icon-button .dashicons {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+}
+
+.bank-notify-danger-zone {
+    margin: 40px 0;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.bank-notify-danger-zone h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+    color: #1d2327;
+}
+
+.bank-notify-danger-zone h3 {
+    color: #1d2327;
+}
+
+.bank-notify-danger-zone hr {
+    border-color: #dcdcde;
+}
+
+.bank-notify-neutral-action {
+    color: #1d2327 !important;
+    border-color: #8c8f94 !important;
+    background: #f6f7f7 !important;
+}
+
+.bank-notify-neutral-action:hover,
+.bank-notify-neutral-action:focus {
+    color: #1d2327 !important;
+    border-color: #646970 !important;
+    background: #f0f0f1 !important;
+}

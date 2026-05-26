@@ -26,8 +26,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
         ></textarea>
 
         <p style="margin-top: 15px;">
-            <button type="submit" class="button button-primary">
-                <span class="dashicons dashicons-upload" style="margin-top: 3px;"></span>
+            <button type="submit" class="button button-primary bank-notify-icon-button">
+                <span class="dashicons dashicons-upload"></span>
                 Import mã
             </button>
         </p>
@@ -35,9 +35,9 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
 </div>
 
 <!-- Danger Zone -->
-<div class="bank-notify-danger-zone" style="margin: 40px 0; padding: 20px; background: #fff; border: 1px solid #dc3232; border-radius: 4px;">
-    <h2 style="color: #dc3232; margin-top: 0;">
-        <span class="dashicons dashicons-warning" style="margin-top: 3px;"></span>
+<div class="bank-notify-danger-zone">
+    <h2>
+        <span class="dashicons dashicons-warning"></span>
         Vùng nguy hiểm
     </h2>
 
@@ -49,9 +49,26 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn giải phóng các mã hết hạn?');">
             <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
             <input type="hidden" name="bank_notify_action" value="release_expired">
-            <button type="submit" class="button button-secondary">
-                <span class="dashicons dashicons-clock" style="margin-top: 3px;"></span>
+            <button type="submit" class="button button-secondary bank-notify-icon-button">
+                <span class="dashicons dashicons-clock"></span>
                 Giải phóng mã hết hạn
+            </button>
+        </form>
+    </div>
+
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+    <div style="margin: 20px 0;">
+        <h3>Xóa mã thanh toán khả dụng</h3>
+        <p class="description">
+            Hành động này chỉ xóa các mã thanh toán đang ở trạng thái "Khả dụng". Các mã đã gán hoặc đã dùng sẽ được giữ lại.
+        </p>
+        <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tất cả mã thanh toán đang khả dụng? Hành động này không thể hoàn tác!');">
+            <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
+            <input type="hidden" name="bank_notify_action" value="delete_available">
+            <button type="submit" class="button button-secondary bank-notify-icon-button bank-notify-neutral-action">
+                <span class="dashicons dashicons-trash"></span>
+                Xóa mã khả dụng
             </button>
         </form>
     </div>
@@ -66,8 +83,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn xóa TẤT CẢ mã thanh toán? Hành động này không thể hoàn tác!');">
             <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
             <input type="hidden" name="bank_notify_action" value="delete_all">
-            <button type="submit" class="button" style="background: #dc3232; color: #fff; border-color: #dc3232;">
-                <span class="dashicons dashicons-trash" style="margin-top: 3px;"></span>
+            <button type="submit" class="button button-secondary bank-notify-icon-button bank-notify-neutral-action">
+                <span class="dashicons dashicons-trash"></span>
                 Xóa tất cả mã
             </button>
         </form>
@@ -81,8 +98,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn tạo lại bảng database? Tất cả dữ liệu sẽ bị xóa!');">
             <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
             <input type="hidden" name="bank_notify_action" value="recreate_table">
-            <button type="submit" class="button" style="background: #dc3232; color: #fff; border-color: #dc3232;">
-                <span class="dashicons dashicons-database" style="margin-top: 3px;"></span>
+            <button type="submit" class="button button-secondary bank-notify-icon-button bank-notify-neutral-action">
+                <span class="dashicons dashicons-database"></span>
                 Tạo lại bảng
             </button>
         </form>

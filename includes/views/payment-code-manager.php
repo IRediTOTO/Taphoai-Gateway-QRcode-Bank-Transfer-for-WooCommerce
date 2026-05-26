@@ -56,6 +56,19 @@ if (isset($_POST['bank_notify_action'])) {
 
         // Refresh stats
         $bank_notify_stats = $bank_notify_manager->get_stats(false);
+    } elseif ($bank_notify_action === 'delete_available') {
+        $bank_notify_deleted_count = $bank_notify_manager->delete_codes_by_status('available');
+
+        if ($bank_notify_deleted_count === false) {
+            $bank_notify_message = 'Không thể xóa mã thanh toán khả dụng. Vui lòng thử lại.';
+            $bank_notify_message_type = 'error';
+        } else {
+            $bank_notify_message = sprintf('Đã xóa %d mã thanh toán khả dụng.', $bank_notify_deleted_count);
+            $bank_notify_message_type = 'success';
+        }
+
+        // Refresh stats
+        $bank_notify_stats = $bank_notify_manager->get_stats(false);
     } elseif ($bank_notify_action === 'recreate_table') {
         // Recreate table
         $bank_notify_db = new Taphoai_BankNotify_DB();
@@ -94,12 +107,12 @@ $bank_notify_current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['
     <h2 class="nav-tab-wrapper">
            <a href="<?php echo esc_url(add_query_arg('tab', 'import', remove_query_arg(['status', 'paged']))); ?>"
            class="nav-tab <?php echo esc_attr($bank_notify_current_tab === 'import' ? 'nav-tab-active' : ''); ?>">
-            <span class="dashicons dashicons-upload" style="margin-top: 3px;"></span>
+            <span class="dashicons dashicons-upload"></span>
             Import mã
         </a>
         <a href="<?php echo esc_url(add_query_arg('tab', 'list', remove_query_arg(['status', 'paged']))); ?>"
            class="nav-tab <?php echo esc_attr($bank_notify_current_tab === 'list' ? 'nav-tab-active' : ''); ?>">
-            <span class="dashicons dashicons-list-view" style="margin-top: 3px;"></span>
+            <span class="dashicons dashicons-list-view"></span>
             Danh sách mã
         </a>
     </h2>

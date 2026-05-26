@@ -417,6 +417,26 @@ class Taphoai_BankNotify_Payment_Code_Manager
     }
 
     /**
+     * Delete codes by status.
+     */
+    public function delete_codes_by_status($status)
+    {
+        global $wpdb;
+
+        if (!in_array($status, ['available', 'assigned', 'used'], true)) {
+            return false;
+        }
+
+        $deleted = $wpdb->delete($this->table_name, ['status' => $status], ['%s']);
+
+        if ($deleted !== false) {
+            delete_transient('bank_notify_stats_cache');
+        }
+
+        return $deleted;
+    }
+
+    /**
      * Get code by order ID
      */
     public function get_code_by_order_id($order_id)

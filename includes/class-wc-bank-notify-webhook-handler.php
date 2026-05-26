@@ -340,10 +340,9 @@ class Taphoai_BankNotify_Webhook_Handler
         $gateway = new Taphoai_Gateway_BankNotify();
         $prefix = $gateway->get_option('pay_code_prefix', 'DH');
 
-        // Kiểm tra xem payment_code có bắt đầu bằng prefix không
-        if (strpos($payment_code, $prefix) === 0) {
-            // Trích xuất order ID từ payment code
-            $order_id = substr($payment_code, strlen($prefix));
+        // Kiểm tra xem payment_code có chứa mã dạng prefix + order ID không.
+        if (preg_match('/(?:^|[^a-z0-9])' . preg_quote($prefix, '/') . '(\d+)\b/i', $payment_code, $matches)) {
+            $order_id = $matches[1];
 
             // Kiểm tra xem order_id có phải là số không
             if (is_numeric($order_id)) {

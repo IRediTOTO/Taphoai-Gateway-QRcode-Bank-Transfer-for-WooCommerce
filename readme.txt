@@ -5,7 +5,7 @@ Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -79,7 +79,7 @@ The order received page can be viewed by guest checkout customers. The public AJ
 
 == Changelog ==
 
-= 1.0.5 =
+= 1.0.6 =
 * Fix: Remove `.github` and other development folders from release zip.
 
 = 1.0.4 =

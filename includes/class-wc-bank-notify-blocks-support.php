@@ -6,12 +6,12 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-final class Taphoai_BankNotify_Blocks_Support extends AbstractPaymentMethodType
+final class TaphGaqr_Blocks_Support extends AbstractPaymentMethodType
 {
     protected $name = 'bank_notify';
 
     public function initialize() {
-        $this->settings = get_option('woocommerce_bank_notify_settings', []);
+        $this->settings = get_option('woocommerce_taphgaqr_settings', []);
     }
 
     public function is_active()
@@ -57,6 +57,6 @@ final class Taphoai_BankNotify_Blocks_Support extends AbstractPaymentMethodType
     }
 }
 
-if (!class_exists('WC_BankNotify_Blocks_Support', false)) {
-    class_alias('Taphoai_BankNotify_Blocks_Support', 'WC_BankNotify_Blocks_Support');
+if (!class_exists('TaphGaqr_WC_Blocks_Support', false)) {
+    class_alias('TaphGaqr_Blocks_Support', 'TaphGaqr_WC_Blocks_Support');
 }

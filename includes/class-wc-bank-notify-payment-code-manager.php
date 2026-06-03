@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom payment-code pool table operations require direct $wpdb calls.
 
-class Taphoai_BankNotify_Payment_Code_Manager
+class TaphGaqr_Payment_Code_Manager
 {
     public const MIN_CODE_LENGTH = 12;
 
@@ -15,7 +15,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
 
     public function __construct()
     {
-        $this->db = new Taphoai_BankNotify_DB();
+        $this->db = new TaphGaqr_DB();
         $this->table_name = $this->db->get_table_name();
     }
 
@@ -27,7 +27,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
     {
         global $wpdb;
 
-        Taphoai_BankNotify_Logger::debug('Attempting to get available payment code', ['order_id' => $order_id]);
+        TaphGaqr_Logger::debug('Attempting to get available payment code', ['order_id' => $order_id]);
 
         // Start transaction
         $wpdb->query('START TRANSACTION');
@@ -47,7 +47,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
 
             if (!$code_row) {
                 $wpdb->query('ROLLBACK');
-                Taphoai_BankNotify_Logger::warning('No available payment codes; caller should fall back to prefix mode', ['order_id' => $order_id]);
+                TaphGaqr_Logger::warning('No available payment codes; caller should fall back to prefix mode', ['order_id' => $order_id]);
                 return false;
             }
 
@@ -66,7 +66,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
 
             if ($updated === false) {
                 $wpdb->query('ROLLBACK');
-                Taphoai_BankNotify_Logger::error('Failed to update payment code status', [
+                TaphGaqr_Logger::error('Failed to update payment code status', [
                     'order_id' => $order_id,
                     'code' => $code_row->code,
                 ]);
@@ -76,7 +76,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
             // Commit transaction
             $wpdb->query('COMMIT');
 
-            Taphoai_BankNotify_Logger::info('Payment code assigned successfully', [
+            TaphGaqr_Logger::info('Payment code assigned successfully', [
                 'order_id' => $order_id,
                 'code' => $code_row->code,
             ]);
@@ -85,7 +85,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
 
         } catch (Exception $e) {
             $wpdb->query('ROLLBACK');
-            Taphoai_BankNotify_Logger::error('Exception while getting available code', [
+            TaphGaqr_Logger::error('Exception while getting available code', [
                 'order_id' => $order_id,
                 'error' => $e->getMessage(),
             ]);
@@ -100,7 +100,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
     {
         global $wpdb;
 
-        Taphoai_BankNotify_Logger::debug('Releasing payment code', ['code' => $code]);
+        TaphGaqr_Logger::debug('Releasing payment code', ['code' => $code]);
 
         $order_id = $wpdb->get_var(
             $wpdb->prepare(
@@ -123,8 +123,8 @@ class Taphoai_BankNotify_Payment_Code_Manager
         );
 
         if ($updated !== false) {
-            delete_transient('bank_notify_stats_cache');
-            Taphoai_BankNotify_Logger::info('Payment code released successfully', ['code' => $code]);
+            delete_transient('taphgaqr_stats_cache');
+            TaphGaqr_Logger::info('Payment code released successfully', ['code' => $code]);
 
             if ($order_id) {
                 $order = wc_get_order($order_id);
@@ -134,7 +134,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
                 }
             }
         } else {
-            Taphoai_BankNotify_Logger::warning('Failed to release payment code', ['code' => $code]);
+            TaphGaqr_Logger::warning('Failed to release payment code', ['code' => $code]);
         }
 
         return $updated !== false;
@@ -150,7 +150,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
         $deleted = $wpdb->delete($this->table_name, ['code' => $code], ['%s']);
 
         if ($deleted !== false) {
-            delete_transient('bank_notify_stats_cache');
+            delete_transient('taphgaqr_stats_cache');
         }
 
         return $deleted !== false;
@@ -254,9 +254,9 @@ class Taphoai_BankNotify_Payment_Code_Manager
      */
     public function clear_order_payment_code($order)
     {
-        $order->delete_meta_data('_bank_notify_payment_code');
-        $order->delete_meta_data('_bank_notify_payment_mode');
-        $order->delete_meta_data('_bank_notify_code_assigned_at');
+        $order->delete_meta_data('_taphgaqr_payment_code');
+        $order->delete_meta_data('_taphgaqr_payment_mode');
+        $order->delete_meta_data('_taphgaqr_code_assigned_at');
     }
 
     /**
@@ -299,7 +299,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
         );
 
         if ($updated !== false) {
-            delete_transient('bank_notify_stats_cache');
+            delete_transient('taphgaqr_stats_cache');
         }
 
         return $updated !== false;
@@ -364,7 +364,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
                 $stats['imported']++;
             } else {
                 $stats['errors']++;
-                Taphoai_BankNotify_Logger::error('Failed to insert payment code', [
+                TaphGaqr_Logger::error('Failed to insert payment code', [
                     'code' => $code,
                     'db_error' => $wpdb->last_error,
                 ]);
@@ -372,7 +372,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
         }
 
         // Clear stats cache
-        delete_transient('bank_notify_stats_cache');
+        delete_transient('taphgaqr_stats_cache');
 
         return $stats;
     }
@@ -392,7 +392,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
     public function get_stats($use_cache = true)
     {
         if ($use_cache) {
-            $cached = get_transient('bank_notify_stats_cache');
+            $cached = get_transient('taphgaqr_stats_cache');
             if ($cached !== false) {
                 return $cached;
             }
@@ -401,7 +401,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
         $stats = $this->db->get_stats();
 
         // Cache for 5 minutes
-        set_transient('bank_notify_stats_cache', $stats, 5 * MINUTE_IN_SECONDS);
+        set_transient('taphgaqr_stats_cache', $stats, 5 * MINUTE_IN_SECONDS);
 
         return $stats;
     }
@@ -412,7 +412,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
     public function delete_all_codes()
     {
         $result = $this->db->truncate_table();
-        delete_transient('bank_notify_stats_cache');
+        delete_transient('taphgaqr_stats_cache');
         return $result !== false;
     }
 
@@ -430,7 +430,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
         $deleted = $wpdb->delete($this->table_name, ['status' => $status], ['%s']);
 
         if ($deleted !== false) {
-            delete_transient('bank_notify_stats_cache');
+            delete_transient('taphgaqr_stats_cache');
         }
 
         return $deleted;
@@ -517,7 +517,7 @@ class Taphoai_BankNotify_Payment_Code_Manager
         }
 
         // Clear cache
-        delete_transient('bank_notify_stats_cache');
+        delete_transient('taphgaqr_stats_cache');
 
         return $stats;
     }
@@ -541,6 +541,6 @@ class Taphoai_BankNotify_Payment_Code_Manager
     }
 }
 
-if (!class_exists('WC_BankNotify_Payment_Code_Manager', false)) {
-    class_alias('Taphoai_BankNotify_Payment_Code_Manager', 'WC_BankNotify_Payment_Code_Manager');
+if (!class_exists('TaphGaqr_WC_Payment_Code_Manager', false)) {
+    class_alias('TaphGaqr_Payment_Code_Manager', 'TaphGaqr_WC_Payment_Code_Manager');
 }

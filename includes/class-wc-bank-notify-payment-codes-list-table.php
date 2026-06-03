@@ -10,7 +10,7 @@ if (!class_exists('WP_List_Table')) {
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom list table reads and bulk actions use the plugin payment-code table.
 
-class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
+class TaphGaqr_Payment_Codes_List_Table extends WP_List_Table
 {
     private $manager;
     private $db;
@@ -23,8 +23,8 @@ class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
             'ajax'     => false,
         ]);
 
-        $this->manager = new Taphoai_BankNotify_Payment_Code_Manager();
-        $this->db = new Taphoai_BankNotify_DB();
+        $this->manager = new TaphGaqr_Payment_Code_Manager();
+        $this->db = new TaphGaqr_DB();
     }
 
     /**
@@ -427,7 +427,7 @@ class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
             return;
         }
 
-        if (!bank_notify_current_user_can_manage()) {
+        if (!taphgaqr_current_user_can_manage()) {
             return;
         }
 
@@ -449,11 +449,11 @@ class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
                 foreach ($codes as $code) {
                     $wpdb->delete($table_name, ['code' => $code], ['%s']);
                 }
-                delete_transient('bank_notify_stats_cache');
+                delete_transient('taphgaqr_stats_cache');
 
                 add_settings_error(
-                    'bank_notify_messages',
-                    'bank_notify_message',
+                    'taphgaqr_messages',
+                    'taphgaqr_message',
                     sprintf('Đã xóa %d mã thanh toán.', count($codes)),
                     'success'
                 );
@@ -476,11 +476,11 @@ class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
                         ['%s', '%s']
                     );
                 }
-                delete_transient('bank_notify_stats_cache');
+                delete_transient('taphgaqr_stats_cache');
 
                 add_settings_error(
-                    'bank_notify_messages',
-                    'bank_notify_message',
+                    'taphgaqr_messages',
+                    'taphgaqr_message',
                     sprintf('Đã đánh dấu %d mã là khả dụng.', count($codes)),
                     'success'
                 );
@@ -493,6 +493,6 @@ class Taphoai_BankNotify_Payment_Codes_List_Table extends WP_List_Table
     }
 }
 
-if (!class_exists('WC_BankNotify_Payment_Codes_List_Table', false)) {
-    class_alias('Taphoai_BankNotify_Payment_Codes_List_Table', 'WC_BankNotify_Payment_Codes_List_Table');
+if (!class_exists('TaphGaqr_WC_Payment_Codes_List_Table', false)) {
+    class_alias('TaphGaqr_Payment_Codes_List_Table', 'TaphGaqr_WC_Payment_Codes_List_Table');
 }

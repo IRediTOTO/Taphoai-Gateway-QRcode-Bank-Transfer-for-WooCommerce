@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
  * Logger class for Bank Notify plugin
  * Handles debug logging to bank-notify.log file
  */
-class Taphoai_BankNotify_Logger
+class TaphGaqr_Logger
 {
     /**
      * Log file name
@@ -40,7 +40,7 @@ class Taphoai_BankNotify_Logger
     /**
      * Get gateway instance
      *
-     * @return Taphoai_Gateway_BankNotify|null
+     * @return TaphGaqr_Gateway_BankNotify|null
      */
     private static function get_gateway()
     {
@@ -169,6 +169,6 @@ class Taphoai_BankNotify_Logger
     }
 }
 
-if (!class_exists('WC_BankNotify_Logger', false)) {
-    class_alias('Taphoai_BankNotify_Logger', 'WC_BankNotify_Logger');
+if (!class_exists('TaphGaqr_WC_Logger', false)) {
+    class_alias('TaphGaqr_Logger', 'TaphGaqr_WC_Logger');
 }

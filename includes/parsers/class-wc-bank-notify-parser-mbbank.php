@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
  * - SD: Số dư (Balance)
  * - ND: Nội dung (Description/Content) - chứa payment code
  */
-class Taphoai_BankNotify_Parser_MBBank extends Taphoai_BankNotify_Parser_Abstract
+class TaphGaqr_Parser_MBBank extends TaphGaqr_Parser_Abstract
 {
     /**
      * Kiểm tra xem message có phải từ MBBank không
@@ -162,6 +162,6 @@ class Taphoai_BankNotify_Parser_MBBank extends Taphoai_BankNotify_Parser_Abstrac
     }
 }
 
-if (!class_exists('WC_BankNotify_Parser_MBBank', false)) {
-    class_alias('Taphoai_BankNotify_Parser_MBBank', 'WC_BankNotify_Parser_MBBank');
+if (!class_exists('TaphGaqr_WC_Parser_MBBank', false)) {
+    class_alias('TaphGaqr_Parser_MBBank', 'TaphGaqr_WC_Parser_MBBank');
 }

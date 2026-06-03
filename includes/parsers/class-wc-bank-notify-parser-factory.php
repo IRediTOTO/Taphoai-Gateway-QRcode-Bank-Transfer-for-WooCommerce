@@ -7,35 +7,35 @@ if (!defined('ABSPATH')) {
 /**
  * Factory class để tự động detect và tạo parser phù hợp
  */
-class Taphoai_BankNotify_Parser_Factory
+class TaphGaqr_Parser_Factory
 {
     /**
      * Danh sách các parser classes
      */
     private static $parsers = [
-        'Taphoai_BankNotify_Parser_TPBank',
-        'Taphoai_BankNotify_Parser_MBBank',
+        'TaphGaqr_Parser_TPBank',
+        'TaphGaqr_Parser_MBBank',
     ];
 
     /**
      * Parser riêng cho các ngân hàng đã hỗ trợ format cụ thể.
      */
     private static $bank_parser_map = [
-        'tpbank' => 'Taphoai_BankNotify_Parser_TPBank',
-        'tpb' => 'Taphoai_BankNotify_Parser_TPBank',
-        'mbbank' => 'Taphoai_BankNotify_Parser_MBBank',
-        'mb' => 'Taphoai_BankNotify_Parser_MBBank',
+        'tpbank' => 'TaphGaqr_Parser_TPBank',
+        'tpb' => 'TaphGaqr_Parser_TPBank',
+        'mbbank' => 'TaphGaqr_Parser_MBBank',
+        'mb' => 'TaphGaqr_Parser_MBBank',
     ];
 
     /**
      * Tạo parser phù hợp dựa trên message body
      * 
      * @param string $body Message body từ webhook
-     * @return Taphoai_BankNotify_Parser_Abstract
+     * @return TaphGaqr_Parser_Abstract
      */
     public static function create($body)
     {
-        Taphoai_BankNotify_Logger::debug('Parser Factory: Detecting bank from message', [
+        TaphGaqr_Logger::debug('Parser Factory: Detecting bank from message', [
             'body_preview' => substr($body, 0, 100),
         ]);
 
@@ -52,7 +52,7 @@ class Taphoai_BankNotify_Parser_Factory
 
             if ($parser_class && class_exists($parser_class)) {
                 $parser = new $parser_class($body);
-                Taphoai_BankNotify_Logger::info('Parser Factory: Bank key detected, using specific parser', [
+                TaphGaqr_Logger::info('Parser Factory: Bank key detected, using specific parser', [
                     'parser' => $parser_class,
                     'bank_key' => $detected_bank['key'],
                     'bank_name' => $parser->get_bank_name(),
@@ -61,18 +61,18 @@ class Taphoai_BankNotify_Parser_Factory
                 return $parser;
             }
 
-            Taphoai_BankNotify_Logger::info('Parser Factory: Bank key detected, using generic parser', [
+            TaphGaqr_Logger::info('Parser Factory: Bank key detected, using generic parser', [
                 'bank_key' => $detected_bank['key'],
                 'bank_name' => $detected_bank['short_name'],
                 'bank_code' => $detected_bank['code'],
             ]);
 
-            return new Taphoai_BankNotify_Parser_Generic($body, $detected_bank['short_name'], $detected_bank['code']);
+            return new TaphGaqr_Parser_Generic($body, $detected_bank['short_name'], $detected_bank['code']);
         }
 
         // Không có bank key trong body thì dùng parser mặc định để cố gắng trích xuất dữ liệu.
-        Taphoai_BankNotify_Logger::warning('Parser Factory: No bank key detected, using generic parser');
-        return new Taphoai_BankNotify_Parser_Generic($body);
+        TaphGaqr_Logger::warning('Parser Factory: No bank key detected, using generic parser');
+        return new TaphGaqr_Parser_Generic($body);
     }
 
     /**
@@ -80,12 +80,12 @@ class Taphoai_BankNotify_Parser_Factory
      */
     private static function detect_bank_from_body($body)
     {
-        if (!class_exists('Taphoai_Gateway_BankNotify') || !method_exists('Taphoai_Gateway_BankNotify', 'get_supported_bank_data')) {
+        if (!class_exists('TaphGaqr_Gateway_BankNotify') || !method_exists('TaphGaqr_Gateway_BankNotify', 'get_supported_bank_data')) {
             return null;
         }
 
         $body_lower = function_exists('mb_strtolower') ? mb_strtolower($body, 'UTF-8') : strtolower($body);
-        $bank_data = Taphoai_Gateway_BankNotify::get_supported_bank_data();
+        $bank_data = TaphGaqr_Gateway_BankNotify::get_supported_bank_data();
 
         foreach ($bank_data as $bank_key => $bank) {
             $needles = array_filter([
@@ -117,7 +117,7 @@ class Taphoai_BankNotify_Parser_Factory
             // Thêm vào đầu mảng để ưu tiên parser mới
             array_unshift(self::$parsers, $parser_class);
 
-            Taphoai_BankNotify_Logger::debug('Parser Factory: New parser registered', [
+            TaphGaqr_Logger::debug('Parser Factory: New parser registered', [
                 'parser' => $parser_class,
             ]);
         }
@@ -158,6 +158,6 @@ class Taphoai_BankNotify_Parser_Factory
     }
 }
 
-if (!class_exists('WC_BankNotify_Parser_Factory', false)) {
-    class_alias('Taphoai_BankNotify_Parser_Factory', 'WC_BankNotify_Parser_Factory');
+if (!class_exists('TaphGaqr_WC_Parser_Factory', false)) {
+    class_alias('TaphGaqr_Parser_Factory', 'TaphGaqr_WC_Parser_Factory');
 }

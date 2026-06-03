@@ -6,14 +6,14 @@ if (!defined('ABSPATH')) {
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Custom plugin table operations require direct $wpdb calls.
 
-class Taphoai_BankNotify_DB
+class TaphGaqr_DB
 {
     private $table_name;
 
     public function __construct()
     {
         global $wpdb;
-        $this->table_name = $wpdb->prefix . 'bank_notify_payment_codes';
+        $this->table_name = $wpdb->prefix . 'taphgaqr_payment_codes';
     }
 
     /**
@@ -53,9 +53,9 @@ class Taphoai_BankNotify_DB
         // Verify table was created
         if ($this->table_exists()) {
             // Store database version
-            update_option('bank_notify_db_version', '1.0.0');
+            update_option('taphgaqr_db_version', '1.0.0');
         } else {
-            do_action('bank_notify_db_create_failed', $this->table_name);
+            do_action('taphgaqr_db_create_failed', $this->table_name);
         }
     }
 
@@ -77,7 +77,7 @@ class Taphoai_BankNotify_DB
     {
         global $wpdb;
         $wpdb->query($wpdb->prepare('DROP TABLE IF EXISTS %i', $this->table_name));
-        delete_option('bank_notify_db_version');
+        delete_option('taphgaqr_db_version');
     }
 
     /**
@@ -184,6 +184,6 @@ class Taphoai_BankNotify_DB
     }
 }
 
-if (!class_exists('WC_BankNotify_DB', false)) {
-    class_alias('Taphoai_BankNotify_DB', 'WC_BankNotify_DB');
+if (!class_exists('TaphGaqr_WC_DB', false)) {
+    class_alias('TaphGaqr_DB', 'TaphGaqr_WC_DB');
 }

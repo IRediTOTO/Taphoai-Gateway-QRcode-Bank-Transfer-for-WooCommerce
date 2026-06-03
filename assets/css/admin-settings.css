@@ -147,3 +147,25 @@ h3.wc-settings-sub-title + p {
     border-color: #646970 !important;
     background: #f0f0f1 !important;
 }
+
+.bank-notify-list-section .tablenav {
+    margin: 10px 0;
+}
+
+.bank-notify-list-section .widefat {
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.bank-notify-list-section .widefat thead th,
+.bank-notify-list-section .widefat tfoot th {
+    background: #f6f7f7;
+}
+
+.bank-notify-list-section .widefat tbody tr:hover {
+    background: #f6f7f7;
+}
+
+.bank-notify-list-section .subsubsub {
+    margin: 10px 0;
+}

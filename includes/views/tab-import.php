@@ -3,20 +3,20 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$bank_notify_manager = new Taphoai_BankNotify_Payment_Code_Manager();
-$bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE_LENGTH;
+$taphgaqr_manager = new TaphGaqr_Payment_Code_Manager();
+$taphgaqr_min_code_length = TaphGaqr_Payment_Code_Manager::MIN_CODE_LENGTH;
 ?>
 
 <!-- Import Codes Section -->
 <div class="bank-notify-import-section" style="margin: 30px 0;">
     <h2>Import mã thanh toán</h2>
     <p class="description">
-        Nhập danh sách mã thanh toán, mỗi mã một dòng. Hệ thống sẽ tự động bỏ qua các mã trùng lặp và mã ngắn hơn <?php echo esc_html($bank_notify_min_code_length); ?> ký tự. Nên thêm ít nhất 500 mã để đảm bảo luôn có mã khả dụng cho khách hàng. Nếu hết mã khả dụng, hệ thống sẽ tự động chuyển về chế độ "Tiền tố + Mã đơn hàng". Mã có thể chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt (trừ xuống dòng).
+        Nhập danh sách mã thanh toán, mỗi mã một dòng. Hệ thống sẽ tự động bỏ qua các mã trùng lặp và mã ngắn hơn <?php echo esc_html($taphgaqr_min_code_length); ?> ký tự. Nên thêm ít nhất 500 mã để đảm bảo luôn có mã khả dụng cho khách hàng. Nếu hết mã khả dụng, hệ thống sẽ tự động chuyển về chế độ "Tiền tố + Mã đơn hàng". Mã có thể chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt (trừ xuống dòng).
     </p>
 
     <form method="post" action="">
-        <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
-        <input type="hidden" name="bank_notify_action" value="import">
+        <?php wp_nonce_field('taphgaqr_payment_codes_action'); ?>
+        <input type="hidden" name="taphgaqr_action" value="import">
 
         <textarea
             name="payment_codes"
@@ -47,8 +47,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
             Giải phóng các mã đã được gán nhưng đã hết hạn theo cài đặt thời gian. Mã sẽ trở về trạng thái "Khả dụng".
         </p>
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn giải phóng các mã hết hạn?');">
-            <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
-            <input type="hidden" name="bank_notify_action" value="release_expired">
+            <?php wp_nonce_field('taphgaqr_payment_codes_action'); ?>
+            <input type="hidden" name="taphgaqr_action" value="release_expired">
             <button type="submit" class="button button-secondary bank-notify-icon-button">
                 <span class="dashicons dashicons-clock"></span>
                 Giải phóng mã hết hạn
@@ -64,8 +64,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
             Hành động này chỉ xóa các mã thanh toán đang ở trạng thái "Khả dụng". Các mã đã gán hoặc đã dùng sẽ được giữ lại.
         </p>
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tất cả mã thanh toán đang khả dụng? Hành động này không thể hoàn tác!');">
-            <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
-            <input type="hidden" name="bank_notify_action" value="delete_available">
+            <?php wp_nonce_field('taphgaqr_payment_codes_action'); ?>
+            <input type="hidden" name="taphgaqr_action" value="delete_available">
             <button type="submit" class="button button-secondary bank-notify-icon-button bank-notify-neutral-action">
                 <span class="dashicons dashicons-trash"></span>
                 Xóa mã khả dụng
@@ -81,8 +81,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
             Hành động này sẽ xóa tất cả mã thanh toán trong hệ thống. Không thể hoàn tác!
         </p>
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn xóa TẤT CẢ mã thanh toán? Hành động này không thể hoàn tác!');">
-            <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
-            <input type="hidden" name="bank_notify_action" value="delete_all">
+            <?php wp_nonce_field('taphgaqr_payment_codes_action'); ?>
+            <input type="hidden" name="taphgaqr_action" value="delete_all">
             <button type="submit" class="button button-secondary bank-notify-icon-button bank-notify-neutral-action">
                 <span class="dashicons dashicons-trash"></span>
                 Xóa tất cả mã
@@ -96,8 +96,8 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
             Nếu bảng database bị lỗi, bạn có thể tạo lại. Lưu ý: Tất cả dữ liệu sẽ bị xóa!
         </p>
         <form method="post" action="" onsubmit="return confirm('Bạn có chắc chắn muốn tạo lại bảng database? Tất cả dữ liệu sẽ bị xóa!');">
-            <?php wp_nonce_field('bank_notify_payment_codes_action'); ?>
-            <input type="hidden" name="bank_notify_action" value="recreate_table">
+            <?php wp_nonce_field('taphgaqr_payment_codes_action'); ?>
+            <input type="hidden" name="taphgaqr_action" value="recreate_table">
             <button type="submit" class="button button-secondary bank-notify-icon-button bank-notify-neutral-action">
                 <span class="dashicons dashicons-database"></span>
                 Tạo lại bảng
@@ -123,7 +123,7 @@ $bank_notify_min_code_length = Taphoai_BankNotify_Payment_Code_Manager::MIN_CODE
         <li>Mỗi mã phải là duy nhất (unique).</li>
         <li>Nên import hàng ngàn mã để đảm bảo luôn có mã khả dụng.</li>
         <li>Nếu hết mã khả dụng, hệ thống sẽ tự động chuyển về chế độ "Tiền tố + Mã đơn hàng".</li>
-        <li>Mã phải có ít nhất <?php echo esc_html($bank_notify_min_code_length); ?> ký tự để tránh khớp nhầm nội dung chuyển khoản.</li>
+        <li>Mã phải có ít nhất <?php echo esc_html($taphgaqr_min_code_length); ?> ký tự để tránh khớp nhầm nội dung chuyển khoản.</li>
         <li>Mã có thể chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt (trừ xuống dòng).</li>
     </ul>
 </div>

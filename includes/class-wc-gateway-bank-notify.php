@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
+class TaphGaqr_Gateway_BankNotify extends WC_Payment_Gateway
 {
     public $displayed_bank_name;
 
@@ -358,7 +358,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         jQuery(document).ready(function($) {
             // Toggle payment code fields based on mode
             function togglePaymentCodeFields() {
-                var mode = $('#woocommerce_bank_notify_payment_code_mode').val();
+                var mode = $('#woocommerce_taphgaqr_payment_code_mode').val();
                 var \$modeRow = $('.payment-code-mode-field').closest('tr');
                 var \$prefixField = $('.payment-code-prefix-field');
                 var \$prefixRow = \$prefixField.closest('tr');
@@ -402,7 +402,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             togglePaymentCodeFields();
 
             // Run on mode change
-            $('#woocommerce_bank_notify_payment_code_mode').on('change', function() {
+            $('#woocommerce_taphgaqr_payment_code_mode').on('change', function() {
                 togglePaymentCodeFields();
             });
 
@@ -465,11 +465,11 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
 
     public function process_payment($order_id)
     {
-        Taphoai_BankNotify_Logger::info('Processing payment for order', ['order_id' => $order_id]);
+        TaphGaqr_Logger::info('Processing payment for order', ['order_id' => $order_id]);
 
         $order = wc_get_order($order_id);
         if (!$order) {
-            Taphoai_BankNotify_Logger::error('Payment processing failed: order not found', ['order_id' => $order_id]);
+            TaphGaqr_Logger::error('Payment processing failed: order not found', ['order_id' => $order_id]);
 
             return [
                 'result' => 'failure',
@@ -478,7 +478,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
 
         $this->update_order_status_and_clear_cart($order);
 
-        Taphoai_BankNotify_Logger::debug('Payment processed successfully', [
+        TaphGaqr_Logger::debug('Payment processed successfully', [
             'order_id' => $order_id,
             'order_status' => $order->get_status(),
         ]);
@@ -542,11 +542,11 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         $expiry_time = null;
 
         if ($expiry_enabled) {
-            $assigned_at = $order->get_meta('_bank_notify_code_assigned_at');
+            $assigned_at = $order->get_meta('_taphgaqr_code_assigned_at');
             if (!$assigned_at) {
                 // Set assigned time if not exists
                 $assigned_at = current_time('mysql');
-                $order->update_meta_data('_bank_notify_code_assigned_at', $assigned_at);
+                $order->update_meta_data('_taphgaqr_code_assigned_at', $assigned_at);
                 $order->save();
             }
 
@@ -567,8 +567,8 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/sepay.js');
         $style_version = filemtime(plugin_dir_path(__DIR__) . 'assets/css/sepay.css');
 
-        wp_enqueue_script('bank_notify_script', plugin_dir_url(__DIR__) . 'assets/js/sepay.js', ['jquery'], $script_version, true);
-        wp_enqueue_style('bank_notify_style', plugin_dir_url(__DIR__) . 'assets/css/sepay.css', [], $style_version);
+        wp_enqueue_script('taphgaqr_script', plugin_dir_url(__DIR__) . 'assets/js/sepay.js', ['jquery'], $script_version, true);
+        wp_enqueue_style('taphgaqr_style', plugin_dir_url(__DIR__) . 'assets/css/sepay.css', [], $style_version);
 
         $account_number = $this->get_option('sub_account') ? $this->get_option('sub_account') : $this->get_option('bank_account_number');
 
@@ -577,7 +577,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         $expiry_timestamp = 0;
 
         if ($expiry_enabled) {
-            $assigned_at = $order->get_meta('_bank_notify_code_assigned_at');
+            $assigned_at = $order->get_meta('_taphgaqr_code_assigned_at');
             if ($assigned_at) {
                 $expiry_value = absint($this->get_option('payment_code_expiry_value', 24));
                 $expiry_unit = $this->get_option('payment_code_expiry_unit', 'hours');
@@ -586,7 +586,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             }
         }
 
-        wp_localize_script('bank_notify_script', 'bank_notify_vars', [
+        wp_localize_script('taphgaqr_script', 'taphgaqr_vars', [
             'ajax_url' => esc_url(admin_url('admin-ajax.php')),
             'order_code' => $this->get_option('pay_code_prefix') . $order_id,
             'account_number' => $account_number,
@@ -611,7 +611,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
 
         $mode = $this->get_option('payment_code_mode', 'prefix');
 
-        Taphoai_BankNotify_Logger::debug('Getting payment code for order', [
+        TaphGaqr_Logger::debug('Getting payment code for order', [
             'order_id' => $order_id,
             'mode' => $mode,
         ]);
@@ -619,9 +619,9 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         // Kiểm tra xem order đã có mã chưa
         $assigned_new_code = false;
         $assigned_payment_mode = '';
-        $existing_code = $order->get_meta('_bank_notify_payment_code');
+        $existing_code = $order->get_meta('_taphgaqr_payment_code');
         if ($existing_code) {
-            Taphoai_BankNotify_Logger::debug('Using existing payment code', [
+            TaphGaqr_Logger::debug('Using existing payment code', [
                 'order_id' => $order_id,
                 'code' => $existing_code,
             ]);
@@ -629,7 +629,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
         } else {
             if ($mode === 'natural') {
                 // Natural mode - get code from pool
-                $manager = new Taphoai_BankNotify_Payment_Code_Manager();
+                $manager = new TaphGaqr_Payment_Code_Manager();
                 $code = $manager->get_available_code($order_id);
 
                 if (!$code) {
@@ -638,21 +638,21 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
                     $payment_mode = 'prefix';
 
                     // Log warning
-                    Taphoai_BankNotify_Logger::warning('No available payment codes. Falling back to prefix mode', [
+                    TaphGaqr_Logger::warning('No available payment codes. Falling back to prefix mode', [
                         'order_id' => $order_id,
                         'fallback_code' => $code,
                     ]);
                 } else {
-                    Taphoai_BankNotify_Logger::info('Assigned natural payment code from pool', [
+                    TaphGaqr_Logger::info('Assigned natural payment code from pool', [
                         'order_id' => $order_id,
                         'code' => $code,
                     ]);
                     $payment_mode = 'natural';
                 }
 
-                $order->update_meta_data('_bank_notify_payment_code', $code);
-                $order->update_meta_data('_bank_notify_payment_mode', $payment_mode);
-                $order->update_meta_data('_bank_notify_code_assigned_at', current_time('mysql'));
+                $order->update_meta_data('_taphgaqr_payment_code', $code);
+                $order->update_meta_data('_taphgaqr_payment_mode', $payment_mode);
+                $order->update_meta_data('_taphgaqr_code_assigned_at', current_time('mysql'));
                 $order->save();
 
                 $assigned_new_code = true;
@@ -662,15 +662,15 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
                 // Prefix mode
                 $remark = $this->get_option('pay_code_prefix') . $order_id;
 
-                Taphoai_BankNotify_Logger::info('Generated prefix payment code', [
+                TaphGaqr_Logger::info('Generated prefix payment code', [
                     'order_id' => $order_id,
                     'code' => $remark,
                     'prefix' => $this->get_option('pay_code_prefix'),
                 ]);
 
-                $order->update_meta_data('_bank_notify_payment_code', $remark);
-                $order->update_meta_data('_bank_notify_payment_mode', 'prefix');
-                $order->update_meta_data('_bank_notify_code_assigned_at', current_time('mysql'));
+                $order->update_meta_data('_taphgaqr_payment_code', $remark);
+                $order->update_meta_data('_taphgaqr_payment_mode', 'prefix');
+                $order->update_meta_data('_taphgaqr_code_assigned_at', current_time('mysql'));
                 $order->save();
 
                 $assigned_new_code = true;
@@ -683,19 +683,19 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             $original_remark = $remark;
             $remark = 'SEVQR ' . $remark;
 
-            Taphoai_BankNotify_Logger::debug('Applied SEVQR prefix for VietinBank/ABBANK', [
+            TaphGaqr_Logger::debug('Applied SEVQR prefix for VietinBank/ABBANK', [
                 'order_id' => $order_id,
                 'original' => $original_remark,
                 'modified' => $remark,
             ]);
         }
 
-        $stored_transfer_content = (string) $order->get_meta('_bank_notify_transfer_content');
+        $stored_transfer_content = (string) $order->get_meta('_taphgaqr_transfer_content');
         if ($assigned_new_code) {
             $this->store_order_transfer_content($order, $remark, $assigned_payment_mode);
             $order->save();
         } elseif ($stored_transfer_content !== $remark) {
-            $order->update_meta_data('_bank_notify_transfer_content', $remark);
+            $order->update_meta_data('_taphgaqr_transfer_content', $remark);
             $order->save();
         }
 
@@ -708,9 +708,9 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
             return;
         }
 
-        $transfer_content = $order->get_meta('_bank_notify_transfer_content');
+        $transfer_content = $order->get_meta('_taphgaqr_transfer_content');
         if (!$transfer_content) {
-            $transfer_content = $order->get_meta('_bank_notify_payment_code');
+            $transfer_content = $order->get_meta('_taphgaqr_payment_code');
             if ($transfer_content && in_array($this->bank_bin, ['970415', '970425'], true) && !preg_match('/^SEVQR\s+/i', $transfer_content)) {
                 $transfer_content = 'SEVQR ' . $transfer_content;
             }
@@ -732,7 +732,7 @@ class Taphoai_Gateway_BankNotify extends WC_Payment_Gateway
 
     private function store_order_transfer_content($order, $transfer_content, $payment_mode)
     {
-        $order->update_meta_data('_bank_notify_transfer_content', $transfer_content);
+        $order->update_meta_data('_taphgaqr_transfer_content', $transfer_content);
 
         if ($payment_mode === 'natural') {
             $order->add_order_note(
@@ -1042,5 +1042,5 @@ curl -X POST "<?php echo esc_html($webhook_url); ?>" \
 }
 
 if (!class_exists('WC_Gateway_BankNotify', false)) {
-    class_alias('Taphoai_Gateway_BankNotify', 'WC_Gateway_BankNotify');
+    class_alias('TaphGaqr_Gateway_BankNotify', 'WC_Gateway_BankNotify');
 }

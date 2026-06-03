@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 /**
  * Parser cho thông báo từ TPBank
  */
-class Taphoai_BankNotify_Parser_TPBank extends Taphoai_BankNotify_Parser_Abstract
+class TaphGaqr_Parser_TPBank extends TaphGaqr_Parser_Abstract
 {
     /**
      * Kiểm tra xem message có phải từ TPBank không
@@ -93,6 +93,6 @@ class Taphoai_BankNotify_Parser_TPBank extends Taphoai_BankNotify_Parser_Abstrac
     }
 }
 
-if (!class_exists('WC_BankNotify_Parser_TPBank', false)) {
-    class_alias('Taphoai_BankNotify_Parser_TPBank', 'WC_BankNotify_Parser_TPBank');
+if (!class_exists('TaphGaqr_WC_Parser_TPBank', false)) {
+    class_alias('TaphGaqr_Parser_TPBank', 'TaphGaqr_WC_Parser_TPBank');
 }

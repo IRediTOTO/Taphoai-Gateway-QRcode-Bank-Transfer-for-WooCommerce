@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
  * Abstract class cho parser thông báo ngân hàng
  * Mỗi ngân hàng sẽ có parser riêng kế thừa từ class này
  */
-abstract class Taphoai_BankNotify_Parser_Abstract
+abstract class TaphGaqr_Parser_Abstract
 {
     /**
      * Message body từ webhook
@@ -121,6 +121,6 @@ abstract class Taphoai_BankNotify_Parser_Abstract
     }
 }
 
-if (!class_exists('WC_BankNotify_Parser_Abstract', false)) {
-    class_alias('Taphoai_BankNotify_Parser_Abstract', 'WC_BankNotify_Parser_Abstract');
+if (!class_exists('TaphGaqr_WC_Parser_Abstract', false)) {
+    class_alias('TaphGaqr_Parser_Abstract', 'TaphGaqr_WC_Parser_Abstract');
 }

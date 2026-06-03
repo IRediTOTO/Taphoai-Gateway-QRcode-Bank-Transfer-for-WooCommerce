@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 /**
  * Parser mặc định cho webhook chưa có parser riêng.
  */
-class Taphoai_BankNotify_Parser_Generic extends Taphoai_BankNotify_Parser_Abstract
+class TaphGaqr_Parser_Generic extends TaphGaqr_Parser_Abstract
 {
     private $bank_name;
 
@@ -118,6 +118,6 @@ class Taphoai_BankNotify_Parser_Generic extends Taphoai_BankNotify_Parser_Abstra
     }
 }
 
-if (!class_exists('WC_BankNotify_Parser_Generic', false)) {
-    class_alias('Taphoai_BankNotify_Parser_Generic', 'WC_BankNotify_Parser_Generic');
+if (!class_exists('TaphGaqr_WC_Parser_Generic', false)) {
+    class_alias('TaphGaqr_Parser_Generic', 'TaphGaqr_WC_Parser_Generic');
 }

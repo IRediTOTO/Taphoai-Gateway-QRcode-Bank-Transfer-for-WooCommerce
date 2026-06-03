@@ -53,12 +53,10 @@ jobs:
           mkdir -p "build/$PLUGIN_SLUG" dist
 
           rsync -a ./ "build/$PLUGIN_SLUG/" \
-            --exclude '.git/' \
-            --exclude '.github/' \
+            --exclude '.*' \
             --exclude 'build/' \
             --exclude 'dist/' \
-            --exclude 'node_modules/' \
-            --exclude '.DS_Store'
+            --exclude 'node_modules/'
 
           cd build
           zip -r "../dist/${{ steps.plugin.outputs.zip_name }}" "$PLUGIN_SLUG"

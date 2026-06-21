@@ -20,8 +20,14 @@ if (isset($_POST['taphgaqr_action'])) {
     $taphgaqr_action = sanitize_key(wp_unslash($_POST['taphgaqr_action']));
 
     if ($taphgaqr_action === 'import' && !empty($_POST['payment_codes'])) {
-        $taphgaqr_codes_text = sanitize_textarea_field(wp_unslash($_POST['payment_codes']));
-        $taphgaqr_codes_array = array_filter(array_map('trim', explode("\n", $taphgaqr_codes_text)));
+        // Use wp_check_invalid_utf8 + wp_unslash to preserve payment code characters
+        // sanitize_textarea_field must NOT be used here: it strips characters like <, >, &
+        // which may legitimately appear in payment codes, and can also collapse multi-line
+        // input into a single string — causing all 5000 codes to be rejected.
+        $taphgaqr_raw_text        = wp_unslash($_POST['payment_codes']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $taphgaqr_raw_text        = wp_check_invalid_utf8($taphgaqr_raw_text, true);
+        $taphgaqr_codes_text      = str_replace(["\r\n", "\r"], "\n", $taphgaqr_raw_text);
+        $taphgaqr_codes_array     = array_filter(array_map('trim', explode("\n", $taphgaqr_codes_text)));
 
         $taphgaqr_result = $taphgaqr_manager->import_codes($taphgaqr_codes_array);
 

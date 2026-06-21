@@ -185,6 +185,18 @@ class TaphGaqr_Gateway_BankNotify extends WC_Payment_Gateway
                 ],
                 'default' => 'brand_name',
             ],
+            'color_scheme' => [
+                'title' => 'Giao diện màu sắc',
+                'type' => 'select',
+                'desc_tip' => true,
+                'description' => 'Chọn giao diện sáng, tối hoặc tự động theo thiết bị của khách hàng.',
+                'options' => [
+                    'auto'  => 'Tự động (theo thiết bị)',
+                    'light' => 'Sáng (Light)',
+                    'dark'  => 'Tối (Dark)',
+                ],
+                'default' => 'auto',
+            ],
             'logo' => [
                 'title' => 'Logo',
                 'type' => 'logo_upload',
@@ -557,6 +569,11 @@ class TaphGaqr_Gateway_BankNotify extends WC_Payment_Gateway
             $expiry_time = strtotime($assigned_at) + $expiry_seconds;
         }
 
+        $color_scheme = $this->get_option('color_scheme', 'auto');
+        if (!in_array($color_scheme, ['auto', 'light', 'dark'], true)) {
+            $color_scheme = 'auto';
+        }
+
         require_once plugin_dir_path(__FILE__) . 'views/transfer-info.php';
 
         $this->enqueue_sepay_scripts($order_id, $order);
@@ -586,6 +603,11 @@ class TaphGaqr_Gateway_BankNotify extends WC_Payment_Gateway
             }
         }
 
+        $color_scheme = $this->get_option('color_scheme', 'auto');
+        if (!in_array($color_scheme, ['auto', 'light', 'dark'], true)) {
+            $color_scheme = 'auto';
+        }
+
         wp_localize_script('taphgaqr_script', 'taphgaqr_vars', [
             'ajax_url' => esc_url(admin_url('admin-ajax.php')),
             'order_code' => $this->get_option('pay_code_prefix') . $order_id,
@@ -599,6 +621,7 @@ class TaphGaqr_Gateway_BankNotify extends WC_Payment_Gateway
             'success_message' => $this->get_option('success_message') ? wp_kses_post($this->get_option('success_message')) : '<p>Thanh toán thành công!</p>',
             'expiry_enabled' => $expiry_enabled,
             'expiry_timestamp' => $expiry_timestamp,
+            'color_scheme' => $color_scheme,
         ]);
     }
 

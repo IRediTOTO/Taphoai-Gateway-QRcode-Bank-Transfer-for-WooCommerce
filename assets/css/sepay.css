@@ -1,6 +1,60 @@
-:root {
+/* ── Light-mode tokens (default) ── */
+.woocommerce-sepay-bank-details {
     --sepay-color: #006DD6;
+    --sepay-color-hover-bg: rgba(0, 109, 214, 0.08);
+    --sepay-color-hover-bg-strong: rgba(0, 109, 214, 0.15);
+    --sepay-color-active-bg: rgba(0, 109, 214, 0.2);
     --sepay-border: rgb(226 232 240);
+    --sepay-bg: #ffffff;
+    --sepay-banner-bg: #ffffff;
+    --sepay-note-bg: #faebd7a1;
+    --sepay-note-border: #e0cd9d;
+    --sepay-note-icon: #b09b66;
+    --sepay-download-group-bg: #f8fafc;
+    --sepay-muted-text: #64748b;
+    --sepay-muted-text-alt: #6b7280;
+    --sepay-status-text: inherit;
+}
+
+/* ── Dark-mode tokens ── */
+/* Explicit dark: merchant chose "Tối (Dark)" */
+.woocommerce-sepay-bank-details[data-scheme="dark"],
+/* Auto: follow OS/browser preference */
+.woocommerce-sepay-bank-details[data-scheme="auto"] {
+    --sepay-color: #4d9fe8;
+    --sepay-color-hover-bg: rgba(77, 159, 232, 0.12);
+    --sepay-color-hover-bg-strong: rgba(77, 159, 232, 0.22);
+    --sepay-color-active-bg: rgba(77, 159, 232, 0.3);
+    --sepay-border: rgb(55 65 81);
+    --sepay-bg: #1f2937;
+    --sepay-banner-bg: #111827;
+    --sepay-note-bg: rgba(90, 72, 30, 0.45);
+    --sepay-note-border: #7a6228;
+    --sepay-note-icon: #c9a84c;
+    --sepay-download-group-bg: #111827;
+    --sepay-muted-text: #94a3b8;
+    --sepay-muted-text-alt: #9ca3af;
+    --sepay-status-text: #d1d5db;
+}
+
+/* Auto mode: only apply dark tokens when OS is dark */
+@media (prefers-color-scheme: light) {
+    .woocommerce-sepay-bank-details[data-scheme="auto"] {
+        --sepay-color: #006DD6;
+        --sepay-color-hover-bg: rgba(0, 109, 214, 0.08);
+        --sepay-color-hover-bg-strong: rgba(0, 109, 214, 0.15);
+        --sepay-color-active-bg: rgba(0, 109, 214, 0.2);
+        --sepay-border: rgb(226 232 240);
+        --sepay-bg: #ffffff;
+        --sepay-banner-bg: #ffffff;
+        --sepay-note-bg: #faebd7a1;
+        --sepay-note-border: #e0cd9d;
+        --sepay-note-icon: #b09b66;
+        --sepay-download-group-bg: #f8fafc;
+        --sepay-muted-text: #64748b;
+        --sepay-muted-text-alt: #6b7280;
+        --sepay-status-text: inherit;
+    }
 }
 
 .woocommerce-sepay-bank-details {
@@ -9,7 +63,8 @@
     max-width: 56rem;
     border-radius: 0.375rem;
     border: 1px solid var(--sepay-color);
-    background-color: #fff;
+    background-color: var(--sepay-bg);
+    color: var(--sepay-status-text);
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -318,15 +373,15 @@
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
-            border: 1px solid #e0cd9d;
+            border: 1px solid var(--sepay-note-border);
             padding: 0.5rem;
             margin: 0.5rem;
-            background-color: #faebd7a1;
+            background-color: var(--sepay-note-bg);
             border-radius: 0.375rem;
         }
 
         .note svg {
-            color: #b09b66;
+            color: var(--sepay-note-icon);
             width: 1.25rem;
             height: 1.25rem;
             margin-top: 0.125rem;
@@ -415,7 +470,7 @@
 }
 
 .sepay-download .autodownload .subtle {
-    color: #64748b;
+    color: var(--sepay-muted-text);
 }
 
 .sepay-download .autodownload .force-download {
@@ -434,7 +489,7 @@
 .sepay-download .download-list .download-group {
     border-bottom: 1px solid var(--sepay-border);
     padding: 0.5rem 1rem;
-    background-color: #f8fafc;
+    background-color: var(--sepay-download-group-bg);
     font-weight: 500;
 }
 
@@ -475,7 +530,7 @@
 .sepay-download .download-remaining, .sepay-download .download-expire {
     font-size: 0.875rem;
     line-height: 1.25rem;
-    color: #6b7280;
+    color: var(--sepay-muted-text-alt);
 }
 
 .sepay-download .download-button {
@@ -593,7 +648,7 @@
 .sepay-pay-info .manual-box .bank-info .banner {
     min-height: 6.5rem;
     padding: 1rem 1.25rem;
-    background: #fff;
+    background: var(--sepay-banner-bg);
 }
 
 .sepay-pay-info .manual-box .bank-info .banner .bank-logo {
@@ -619,7 +674,7 @@
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
     transition: all 0.2s ease;
-    background-color: rgba(0, 109, 214, 0.08);
+    background-color: var(--sepay-color-hover-bg);
     text-decoration: none;
     color: var(--sepay-color);
     font-weight: 500;
@@ -631,12 +686,12 @@
 }
 
 .sepay-pay-info .manual-box .bank-info .bank-info-value a:hover {
-    background-color: rgba(0, 109, 214, 0.15);
+    background-color: var(--sepay-color-hover-bg-strong);
 }
 
 .sepay-pay-info .manual-box .bank-info .bank-info-value a:active {
     transform: scale(0.97);
-    background-color: rgba(0, 109, 214, 0.2);
+    background-color: var(--sepay-color-active-bg);
 }
 
 .sepay-pay-info .manual-box .bank-info .bank-info-value a.copied {
@@ -649,29 +704,29 @@
 }
 
 .dynamic-sub-account:disabled {
-    background-color: #f5f5f5;
-    color: #999;
+    background-color: var(--sepay-download-group-bg);
+    color: var(--sepay-muted-text-alt);
     cursor: not-allowed;
 }
 
 .dynamic-sub-account:disabled option {
-    color: #999;
+    color: var(--sepay-muted-text-alt);
 }
 
 .dynamic-sub-account option[value=""] {
-    color: #666;
+    color: var(--sepay-muted-text);
     font-style: italic;
 }
 
 .dynamic-sub-account[disabled] {
-    background-color: #f5f5f5;
-    color: #999;
+    background-color: var(--sepay-download-group-bg);
+    color: var(--sepay-muted-text-alt);
     cursor: not-allowed;
     opacity: 0.6;
 }
 
 .dynamic-sub-account[disabled] option {
-    color: #999;
+    color: var(--sepay-muted-text-alt);
 }
 
 @media (max-width: 480px) {

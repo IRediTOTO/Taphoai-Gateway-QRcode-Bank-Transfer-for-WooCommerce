@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<section class="woocommerce-sepay-bank-details">
+<section class="woocommerce-sepay-bank-details" data-scheme="<?php echo esc_attr(isset($color_scheme) ? $color_scheme : 'auto'); ?>">
     <div class="sepay-box">
         <div class="box-title">
             Thanh toán qua chuyển khoản ngân hàng

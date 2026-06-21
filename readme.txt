@@ -5,7 +5,7 @@ Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,6 +78,11 @@ No. Debug logs stay in the WooCommerce log system. The plugin does not upload de
 The order received page can be viewed by guest checkout customers. The public AJAX endpoint requires the order ID, order key, and nonce before returning order status or downloadable item information.
 
 == Changelog ==
+
+= 1.0.7 =
+* Fix: Add `is_subclass_of` check before instantiating registered parser classes to prevent unintended side effects.
+* Fix: Rename JS global `bankNotifyAdmin` to `taphgaqrAdmin` to comply with WordPress.org prefix guidelines.
+* Improvement: Add CSS custom properties and `prefers-color-scheme: dark` support so the payment widget adapts to dark-mode themes.
 
 = 1.0.6 =
 * Fix: Remove `.github` and other development folders from release zip.

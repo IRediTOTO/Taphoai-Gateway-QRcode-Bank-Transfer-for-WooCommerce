@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'bank_notify_delete_single_code',
                 code: code,
-                nonce: bankNotifyAdmin.nonce
+                nonce: taphgaqrAdmin.nonce
             },
             success: function(response) {
                 if (response.success) {
@@ -69,7 +69,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'bank_notify_release_single_code',
                 code: code,
-                nonce: bankNotifyAdmin.nonce
+                nonce: taphgaqrAdmin.nonce
             },
             success: function(response) {
                 if (response.success) {

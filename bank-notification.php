@@ -3,7 +3,7 @@
  * Plugin Name: Taphoai Gateway - QRcode Bank Transfer for WooCommerce
  * Description: Taphoai Gateway - Giải pháp tự động xác nhận thanh toán chuyển khoản ngân hàng qua QR code cho WooCommerce.
  * Author: Taphoai
- * Version: 1.0.6
+ * Version: 1.0.7
  * Requires at least: 6.8
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -440,7 +440,7 @@ function taphgaqr_enqueue_admin_scripts($hook)
         $admin_style_version
     );
 
-    wp_localize_script('bank-notify-admin', 'bankNotifyAdmin', [
+    wp_localize_script('bank-notify-admin', 'taphgaqrAdmin', [
         'nonce' => wp_create_nonce('taphgaqr_admin_action'),
     ]);
 }

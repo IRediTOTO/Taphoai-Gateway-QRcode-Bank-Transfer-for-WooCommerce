@@ -50,7 +50,7 @@ class TaphGaqr_Parser_Factory
                 $parser_class = self::$bank_parser_map[strtolower($detected_bank['code'])];
             }
 
-            if ($parser_class && class_exists($parser_class)) {
+            if ($parser_class && class_exists($parser_class) && is_subclass_of($parser_class, 'TaphGaqr_Parser_Abstract')) {
                 $parser = new $parser_class($body);
                 TaphGaqr_Logger::info('Parser Factory: Bank key detected, using specific parser', [
                     'parser' => $parser_class,
@@ -113,7 +113,7 @@ class TaphGaqr_Parser_Factory
      */
     public static function register_parser($parser_class)
     {
-        if (!in_array($parser_class, self::$parsers)) {
+        if (!in_array($parser_class, self::$parsers) && class_exists($parser_class) && is_subclass_of($parser_class, 'TaphGaqr_Parser_Abstract')) {
             // Thêm vào đầu mảng để ưu tiên parser mới
             array_unshift(self::$parsers, $parser_class);
 
@@ -145,7 +145,7 @@ class TaphGaqr_Parser_Factory
         $banks = [];
 
         foreach (self::$parsers as $parser_class) {
-            if (!class_exists($parser_class)) {
+            if (!class_exists($parser_class) || !is_subclass_of($parser_class, 'TaphGaqr_Parser_Abstract')) {
                 continue;
             }
 

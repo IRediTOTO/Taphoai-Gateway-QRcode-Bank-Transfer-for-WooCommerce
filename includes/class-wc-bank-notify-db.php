@@ -8,12 +8,22 @@ if (!defined('ABSPATH')) {
 
 class TaphGaqr_DB
 {
+    /**
+     * Current (new) table name used by all plugin code.
+     */
     private $table_name;
+
+    /**
+     * Legacy table name used before the plugin was renamed.
+     * wp_bank_notify_payment_codes → wp_taphgaqr_payment_codes
+     */
+    private $legacy_table_name;
 
     public function __construct()
     {
         global $wpdb;
-        $this->table_name = $wpdb->prefix . 'taphgaqr_payment_codes';
+        $this->table_name        = $wpdb->prefix . 'taphgaqr_payment_codes';
+        $this->legacy_table_name = $wpdb->prefix . 'bank_notify_payment_codes';
     }
 
     /**
@@ -22,6 +32,74 @@ class TaphGaqr_DB
     public function get_table_name()
     {
         return $this->table_name;
+    }
+
+    /**
+     * Check whether the legacy table (wp_bank_notify_payment_codes) exists.
+     */
+    private function legacy_table_exists()
+    {
+        global $wpdb;
+        $table = $this->legacy_table_name;
+        return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table)) === $table;
+    }
+
+    /**
+     * Migrate rows from the legacy table into the current table, then drop the legacy table.
+     *
+     * Safe to call multiple times — guarded by a DB option flag so the copy only
+     * runs once.  Returns true if migration ran, false if it was already done or
+     * the legacy table does not exist.
+     */
+    public function maybe_migrate_legacy_table()
+    {
+        global $wpdb;
+
+        // Already migrated?
+        if (get_option('taphgaqr_legacy_migration_done')) {
+            return false;
+        }
+
+        // Nothing to migrate?
+        if (!$this->legacy_table_exists()) {
+            // Mark as done so we never check again.
+            update_option('taphgaqr_legacy_migration_done', '1');
+            return false;
+        }
+
+        // Ensure the new table exists before we copy into it.
+        if (!$this->table_exists()) {
+            $this->create_tables();
+        }
+
+        // Copy every row from the legacy table, ignoring duplicate codes.
+        // INSERT IGNORE silently skips rows whose `code` already exists in the new table.
+        $wpdb->query(
+            "INSERT IGNORE INTO {$this->table_name}
+                (code, status, order_id, assigned_at, used_at, created_at)
+             SELECT code, status, order_id, assigned_at, used_at, created_at
+             FROM {$this->legacy_table_name}"  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table names are constructed from $wpdb->prefix, safe.
+        );
+
+        // Drop the legacy table so it is no longer visible to any code path.
+        $wpdb->query("DROP TABLE IF EXISTS {$this->legacy_table_name}"); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+        // Invalidate any stale stats transient.
+        delete_transient('taphgaqr_stats_cache');
+
+        update_option('taphgaqr_legacy_migration_done', '1');
+
+        return true;
+    }
+
+    /**
+     * Run all pending DB migrations.
+     * Hook this onto `admin_init` so it runs automatically on the first
+     * admin page load after a plugin update.
+     */
+    public function maybe_run_migrations()
+    {
+        $this->maybe_migrate_legacy_table();
     }
 
     /**
@@ -54,6 +132,9 @@ class TaphGaqr_DB
         if ($this->table_exists()) {
             // Store database version
             update_option('taphgaqr_db_version', '1.0.0');
+
+            // Migrate legacy data on first activation of the renamed plugin.
+            $this->maybe_migrate_legacy_table();
         } else {
             do_action('taphgaqr_db_create_failed', $this->table_name);
         }
@@ -66,7 +147,7 @@ class TaphGaqr_DB
     {
         global $wpdb;
         $table = $this->table_name;
-        
+
         return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table)) === $table;
     }
 

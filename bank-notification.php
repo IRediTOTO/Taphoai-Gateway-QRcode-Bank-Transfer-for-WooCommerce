@@ -309,6 +309,31 @@ function taphgaqr_check_codes_notice()
     }
 }
 
+// Run DB migrations on every admin load (idempotent — guarded by an option flag).
+// This handles the case where the plugin is updated without going through
+// activation (e.g. auto-update or manual file replacement), which means the
+// register_activation_hook never fires and create_tables() is never called.
+add_action('admin_init', 'taphgaqr_run_db_migrations');
+
+function taphgaqr_run_db_migrations()
+{
+    // Classes are loaded by taphgaqr_init_gateway_class() on plugins_loaded (priority 10).
+    // admin_init fires later, so the classes will always be available here.
+    if (!class_exists('TaphGaqr_DB')) {
+        return;
+    }
+
+    $db = new TaphGaqr_DB();
+
+    // If the current table doesn't exist yet, create it (and migrate from legacy).
+    if (!$db->table_exists()) {
+        $db->create_tables();
+    } else {
+        // Table already exists — just check for legacy migration.
+        $db->maybe_run_migrations();
+    }
+}
+
 // Handle log viewing and clearing
 add_action('admin_init', 'taphgaqr_handle_log_actions');
 
